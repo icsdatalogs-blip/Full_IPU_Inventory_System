@@ -881,8 +881,7 @@ async function loadTotals() {
     item: r.items?.name ?? `Item ${r.item_id}`,
     onHand: Number(r.total_quantity ?? 0),
     par: Number(r.par_quantity ?? 0),
-  }));
-
+  })).sort((a, b) => (a.item || "").localeCompare(b.item || ""));
   renderSignOut();
 }
 

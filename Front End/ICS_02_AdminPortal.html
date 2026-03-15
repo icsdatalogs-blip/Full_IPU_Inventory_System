@@ -619,11 +619,244 @@ td.qty.on.par-bad{
 .float-toast.error{ border-color: var(--badBorder); background: rgba(239,68,68,.10); color: rgba(127,29,29,1); }
 .float-toast.error .icon{ border-color: var(--badBorder); color: var(--badInk); background: var(--badBg); }
 
+/* Shared modal */
+.modal-overlay{
+  position: fixed;
+  inset: 0;
+  background: rgba(15,23,42,.20);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  display:none;
+  align-items:center;
+  justify-content:center;
+  padding: 18px;
+  z-index: 10050;
+}
+.modal-overlay.show{ display:flex; }
+
+.modal-card{
+  width:min(560px, 96vw);
+  max-height:min(82vh, 760px);
+  overflow:auto;
+  border-radius:16px;
+  border:1px solid rgba(15,23,42,.12);
+  background: rgba(255,255,255,.97);
+  box-shadow: 0 20px 60px rgba(15,23,42,.18);
+  padding:14px;
+}
+
+.modal-card.history-card{
+  width:min(1040px, 98vw);
+}
+
+.modal-head{
+  display:flex;
+  align-items:flex-start;
+  justify-content:space-between;
+  gap:12px;
+  margin-bottom:10px;
+}
+.modal-title{
+  font-size:14px;
+  font-weight:1000;
+  color: rgba(15,23,42,.80);
+}
+.modal-sub{
+  margin-top:3px;
+  font-size:11px;
+  font-weight:800;
+  color: rgba(15,23,42,.52);
+}
+.modal-close{
+  width:34px;
+  height:34px;
+  border-radius:10px;
+  border:1px solid rgba(15,23,42,.12);
+  background: rgba(255,255,255,.92);
+  cursor:pointer;
+  font-size:16px;
+  font-weight:1000;
+}
+.modal-close:hover{ border-color: rgba(var(--teal-rgb), .35); }
+
+/* Par modal */
+.par-list{
+  display:flex;
+  flex-direction:column;
+  gap:8px;
+}
+
+.par-row{
+  display:grid;
+  grid-template-columns: 1fr 96px;
+  gap:10px;
+  align-items:center;
+  border:1px solid rgba(15,23,42,.08);
+  border-radius:12px;
+  background: rgba(255,255,255,.88);
+  padding:10px;
+}
+.par-name{
+  font-size:12px;
+  font-weight:900;
+  color: rgba(15,23,42,.76);
+  min-width:0;
+}
+.par-input{
+  width:100%;
+  height:34px;
+  border-radius:10px;
+  border:1px solid var(--line);
+  background: #fff;
+  padding:0 10px;
+  outline:none;
+  font-size:12px;
+  font-weight:900;
+  color: rgba(15,23,42,.80);
+  text-align:center;
+}
+.par-input:focus{
+  border-color: rgba(var(--teal-rgb), .55);
+  box-shadow: 0 0 0 4px var(--focus);
+}
+
+.modal-actions{
+  display:flex;
+  justify-content:flex-end;
+  gap:8px;
+  margin-top:12px;
+}
+.modal-btn{
+  height:34px;
+  min-width:100px;
+  padding:0 12px;
+  border-radius:10px;
+  border:1px solid rgba(15,23,42,.12);
+  background: rgba(255,255,255,.90);
+  font-size:11px;
+  font-weight:1000;
+  cursor:pointer;
+}
+.modal-btn:hover{ border-color: rgba(var(--teal-rgb), .35); }
+.modal-btn.primary{
+  background: rgba(var(--teal-rgb), .92);
+  color: rgba(255,255,255,.95);
+  border-color: rgba(var(--teal-rgb), .50);
+}
+
+/* History modal */
+.history-controls{
+  display:grid;
+  grid-template-columns: 1fr auto auto;
+  gap:8px;
+  align-items:center;
+  margin-bottom:10px;
+}
+.history-btn{
+  height:36px;
+  min-width:96px;
+  padding:0 12px;
+  border-radius:12px;
+  border:1px solid rgba(15,23,42,.10);
+  background: rgba(255,255,255,.92);
+  color: rgba(15,23,42,.78);
+  font-weight:1000;
+  cursor:pointer;
+}
+.history-btn:hover{ border-color: rgba(var(--teal-rgb), .35); }
+
+.history-wrap{
+  border:1px solid rgba(15,23,42,.08);
+  border-radius:14px;
+  background: rgba(255,255,255,.78);
+  overflow:auto;
+  min-height:260px;
+  max-height:55vh;
+}
+
+.history-table{
+  width:100%;
+  border-collapse:collapse;
+  table-layout:fixed;
+  font-variant-numeric: tabular-nums;
+}
+.history-table thead th{
+  font-size:11px;
+  font-weight:1000;
+  color: rgba(15,23,42,.58);
+  padding: 8px;
+  border-bottom:1px solid rgba(15,23,42,.10);
+  background: rgba(255,255,255,.90);
+  position: sticky;
+  top: 0;
+  z-index: 2;
+  text-align:left;
+}
+.history-table tbody td{
+  padding: 8px;
+  border-bottom:1px solid rgba(15,23,42,.06);
+  font-size:11px;
+  font-weight:800;
+  color: rgba(15,23,42,.74);
+  vertical-align:top;
+}
+.history-table tbody tr:last-child td{ border-bottom:none; }
+
+.history-table th:nth-child(1),
+.history-table td:nth-child(1){ width:170px; }
+.history-table th:nth-child(2),
+.history-table td:nth-child(2){ width:130px; }
+.history-table th:nth-child(3),
+.history-table td:nth-child(3){ width:220px; }
+.history-table th:nth-child(4),
+.history-table td:nth-child(4){ width:120px; }
+.history-table th:nth-child(5),
+.history-table td:nth-child(5){ width:130px; }
+.history-table th:nth-child(6),
+.history-table td:nth-child(6){ width:100px; }
+
+.history-empty{
+  padding: 14px;
+  font-size:12px;
+  font-weight:900;
+  color: rgba(15,23,42,.55);
+}
+
+.status-chip{
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  min-height:24px;
+  padding:0 8px;
+  border-radius:999px;
+  border:1px solid var(--neutralBorder);
+  background: var(--neutralBg);
+  color: var(--neutralInk);
+  font-size:10px;
+  font-weight:1000;
+}
+.status-chip.ok{
+  border-color: var(--okBorder);
+  background: var(--okBg);
+  color: var(--okInk);
+}
+.status-chip.warn{
+  border-color: var(--warnBorder);
+  background: var(--warnBg);
+  color: var(--warnInk);
+}
+.status-chip.bad{
+  border-color: var(--badBorder);
+  background: var(--badBg);
+  color: var(--badInk);
+}
+
 @media (max-width: 980px){
   body{ overflow:auto; }
   main{ height:auto; min-height: calc(100vh - 130px); }
   .grid{ grid-template-columns: 1fr; }
   .right{ grid-template-rows: auto auto; }
+  .history-controls{ grid-template-columns: 1fr; }
 }
 
 @media (prefers-reduced-motion: reduce){
@@ -803,6 +1036,71 @@ td.qty.on.par-bad{
   </div>
 </main>
 
+<!-- Par Level Modal -->
+<div id="parModal" class="modal-overlay" aria-hidden="true">
+  <div class="modal-card" role="dialog" aria-modal="true" aria-labelledby="parModalTitle">
+    <div class="modal-head">
+      <div>
+        <div id="parModalTitle" class="modal-title">Par Level Management</div>
+        <div class="modal-sub">Edit par counts for tracked items</div>
+      </div>
+      <button id="parModalClose" class="modal-close" type="button" aria-label="Close">×</button>
+    </div>
+
+    <div id="parList" class="par-list"></div>
+
+    <div class="modal-actions">
+      <button id="parCancelBtn" class="modal-btn" type="button">Cancel</button>
+      <button id="parSaveBtn" class="modal-btn primary" type="button">Save Par Levels</button>
+    </div>
+  </div>
+</div>
+
+<!-- History Modal -->
+<div id="historyModal" class="modal-overlay" aria-hidden="true">
+  <div class="modal-card history-card" role="dialog" aria-modal="true" aria-labelledby="historyModalTitle">
+    <div class="modal-head">
+      <div>
+        <div id="historyModalTitle" class="modal-title">History</div>
+        <div class="modal-sub">Recent movement history for this IPU · search refines the loaded results</div>
+      </div>
+      <button id="historyModalClose" class="modal-close" type="button" aria-label="Close">×</button>
+    </div>
+
+    <div class="history-controls">
+      <div class="ui-input-wrap">
+        <svg class="ui-search" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+          <path d="M10.5 18a7.5 7.5 0 1 1 0-15 7.5 7.5 0 0 1 0 15Z"
+                stroke="rgba(15,23,42,.55)" stroke-width="1.8"/>
+          <path d="M16.2 16.2 21 21"
+                stroke="rgba(15,23,42,.55)" stroke-width="1.8" stroke-linecap="round"/>
+        </svg>
+        <input id="historySearchInput" class="ui-input" placeholder="Search asset number or asset id…" autocomplete="off" />
+      </div>
+      <button id="historySearchBtn" class="history-btn" type="button">Search</button>
+      <button id="historyResetBtn" class="history-btn" type="button">Reset</button>
+    </div>
+
+    <div class="history-wrap">
+      <table class="history-table" aria-label="Movement History Table">
+        <thead>
+          <tr>
+            <th>Time</th>
+            <th>Asset</th>
+            <th>Item</th>
+            <th>Type</th>
+            <th>Status</th>
+            <th>Role</th>
+            <th>Asset ID</th>
+          </tr>
+        </thead>
+        <tbody id="historyRows"></tbody>
+      </table>
+      <div id="historyEmpty" class="history-empty" style="display:none;">No history found.</div>
+    </div>
+  </div>
+</div>
+
 <script>
 const REST_BASE = "https://sosyqdgeqgfuclffmzgl.supabase.co";
 const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNvc3lxZGdlcWdmdWNsZmZtemdsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Njk3ODA0MjgsImV4cCI6MjA4NTM1NjQyOH0.quknRUYbRqvLMpsCKjlytN38hek5sk1v1o6KJEwTCxQ";
@@ -811,6 +1109,7 @@ const IPU_ID = Number(new URLSearchParams(location.search).get("ipu_id") || 1);
 const EDGE_URL = "https://sosyqdgeqgfuclffmzgl.supabase.co/functions/v1/asset-movement";
 const CONTRACT = { scanTypes: { OUT:"scan_out", IN:"scan_in", VERIFY:"verify" } };
 const TOTALS_TABLE = "ipu_item_totals";
+const HISTORY_TABLE = "scan_history";
 
 const rowsEl = document.getElementById("rows");
 const queueWrap = document.getElementById("queueWrap");
@@ -824,6 +1123,22 @@ const ft = document.getElementById("floatToast");
 const ftIcon = document.getElementById("ftIcon");
 const ftTitle = document.getElementById("ftTitle");
 const ftMsg = document.getElementById("ftMsg");
+
+const parModal = document.getElementById("parModal");
+const parList = document.getElementById("parList");
+const parModalClose = document.getElementById("parModalClose");
+const parCancelBtn = document.getElementById("parCancelBtn");
+const parSaveBtn = document.getElementById("parSaveBtn");
+const parTool = document.getElementById("parTool");
+
+const historyModal = document.getElementById("historyModal");
+const historyModalClose = document.getElementById("historyModalClose");
+const historySearchInput = document.getElementById("historySearchInput");
+const historySearchBtn = document.getElementById("historySearchBtn");
+const historyResetBtn = document.getElementById("historyResetBtn");
+const historyRows = document.getElementById("historyRows");
+const historyEmpty = document.getElementById("historyEmpty");
+const histTool = document.getElementById("histTool");
 
 function sbHeaders(extra = {}) {
   return {
@@ -884,8 +1199,24 @@ function notify({ type="success", title="Saved", message="", icon=null, ms=3200 
   toastTimer = setTimeout(() => ft.classList.remove("show"), ms);
 }
 
+function formatDateTime(value){
+  if(!value) return "";
+  const d = new Date(value);
+  if(Number.isNaN(d.getTime())) return String(value);
+  return d.toLocaleString();
+}
+
+function statusClass(v){
+  const s = String(v || "").toLowerCase();
+  if (["success", "ok"].includes(s)) return "ok";
+  if (["already_on_hand", "warning", "warn"].includes(s)) return "warn";
+  if (["unknown_asset", "error", "failed", "bad"].includes(s)) return "bad";
+  return "";
+}
+
 let TRACKED_ITEMS = [];
 let QUEUE = [];
+let HISTORY_CACHE = [];
 
 function setConfirmEnabled(enabled){
   if(enabled){
@@ -1043,7 +1374,7 @@ async function loadItems() {
     name: r.items?.name ?? `Item ${r.item_id}`,
     on: Number(r.total_quantity ?? 0),
     par: Number(r.par_quantity ?? 0),
-  }));
+  })).sort((a, b) => a.name.localeCompare(b.name));
 
   renderTable();
 }
@@ -1255,6 +1586,183 @@ async function runScan(scan_type){
   assetInput.focus();
 }
 
+/* Par modal */
+function openParModal(){
+  renderParModalList();
+  parModal.classList.add("show");
+  parModal.setAttribute("aria-hidden", "false");
+}
+
+function closeParModal(){
+  parModal.classList.remove("show");
+  parModal.setAttribute("aria-hidden", "true");
+}
+
+function renderParModalList(){
+  parList.innerHTML = "";
+
+  TRACKED_ITEMS.forEach((item, idx) => {
+    const row = document.createElement("div");
+    row.className = "par-row";
+    row.innerHTML = `
+      <div class="par-name" title="${escapeHtml(item.name)}">${escapeHtml(item.name)}</div>
+      <input
+        class="par-input"
+        type="number"
+        min="0"
+        step="1"
+        value="${Number(item.par || 0)}"
+        data-idx="${idx}"
+      />
+    `;
+    parList.appendChild(row);
+  });
+}
+
+async function saveParLevels(){
+  try{
+    const inputs = [...parList.querySelectorAll(".par-input")];
+
+    inputs.forEach(input => {
+      const idx = Number(input.dataset.idx);
+      const val = Math.max(0, Number(input.value || 0));
+      TRACKED_ITEMS[idx].par = val;
+    });
+
+    const payload = TRACKED_ITEMS.map(item => ({
+      ipu_id: IPU_ID,
+      item_id: item.item_id,
+      total_quantity: Number(item.on || 0),
+      par_quantity: Number(item.par || 0),
+    }));
+
+    notify({ type:"pending", title:"Saving", message:"Updating par levels…" });
+    await upsertTotals(payload);
+
+    renderTable();
+    closeParModal();
+    notify({ type:"success", title:"Saved", message:"Par levels updated." });
+    await loadItems();
+  } catch (err){
+    console.error(err);
+    notify({ type:"error", title:"Save failed", message:(err?.message || String(err)).slice(0,220) });
+  }
+}
+
+/* History modal */
+function renderHistoryRows(rows){
+  historyRows.innerHTML = "";
+
+  if(!rows || rows.length === 0){
+    historyEmpty.style.display = "block";
+    return;
+  }
+
+  historyEmpty.style.display = "none";
+
+  rows.forEach(row => {
+    const time = row.created_at ? formatDateTime(row.created_at) : "";
+    const assetNumber = row.assets?.asset_number ?? "—";
+    const itemName = row.assets?.items?.name ?? "—";
+    const typeVal = row.scan_type || "";
+    const statusVal = row.result || "";
+    const roleVal = row.scanner_role || "—";
+    const assetIdVal = row.asset_id ?? "—";
+
+    const tr = document.createElement("tr");
+    tr.innerHTML = `
+      <td>${escapeHtml(time)}</td>
+      <td>${escapeHtml(String(assetNumber))}</td>
+      <td>${escapeHtml(itemName)}</td>
+      <td>${escapeHtml(typeVal)}</td>
+      <td><span class="status-chip ${statusClass(statusVal)}">${escapeHtml(statusVal || "—")}</span></td>
+      <td>${escapeHtml(roleVal)}</td>
+      <td>${escapeHtml(String(assetIdVal))}</td>
+    `;
+    historyRows.appendChild(tr);
+  });
+}
+
+function refineHistoryFromCache(searchTerm = ""){
+  let rows = HISTORY_CACHE;
+
+  if(searchTerm){
+    const q = searchTerm.trim().toLowerCase();
+    rows = HISTORY_CACHE.filter(r => {
+      const assetNumber = String(r.assets?.asset_number ?? "").toLowerCase();
+      const assetId = String(r.asset_id ?? "").toLowerCase();
+      return assetNumber.includes(q) || assetId.includes(q);
+    });
+  }
+
+  renderHistoryRows(rows);
+
+  if(searchTerm){
+    notify({
+      type:"success",
+      title:"History filtered",
+      message:`Showing results for ${searchTerm}`,
+      ms: 1400
+    });
+  }
+}
+
+async function loadHistory(){
+  try{
+    historyRows.innerHTML = "";
+    historyEmpty.style.display = "block";
+    historyEmpty.textContent = "Loading history…";
+
+    notify({ type:"pending", title:"Loading", message:"Fetching history…" });
+
+  const url =
+    `${REST_BASE}/rest/v1/${HISTORY_TABLE}` +
+    `?select=id,created_at,ipu_id,asset_id,item_id,scanner_role,scan_type,result,assets(asset_number,item_id,items(name)),items(name)` +
+    `&ipu_id=eq.${IPU_ID}` +
+    `&order=created_at.desc` +
+    `&limit=250`;
+
+    const res = await fetch(url, { headers: sbHeaders() });
+
+    if(!res.ok){
+      const text = await res.text();
+      throw new Error(text || "Could not load history");
+    }
+
+    const data = await res.json();
+    HISTORY_CACHE = Array.isArray(data) ? data : [];
+
+    renderHistoryRows(HISTORY_CACHE);
+
+    notify({
+      type:"success",
+      title:"History loaded",
+      message:`Showing recent IPU ${IPU_ID} history`,
+      ms: 1600
+    });
+  } catch (err){
+    console.error(err);
+    HISTORY_CACHE = [];
+    historyRows.innerHTML = "";
+    historyEmpty.style.display = "block";
+    historyEmpty.textContent = "Could not load history.";
+    notify({ type:"error", title:"History failed", message:(err?.message || String(err)).slice(0,220) });
+  }
+}
+
+function openHistoryModal(){
+  historySearchInput.value = "";
+  historyModal.classList.add("show");
+  historyModal.setAttribute("aria-hidden", "false");
+  loadHistory();
+  setTimeout(() => historySearchInput.focus(), 50);
+}
+
+function closeHistoryModal(){
+  historyModal.classList.remove("show");
+  historyModal.setAttribute("aria-hidden", "true");
+}
+
 enterBtn.addEventListener("click", async () => {
   await runScan(CONTRACT.scanTypes.IN);
 });
@@ -1267,8 +1775,58 @@ assetInput.addEventListener("keydown", async (e) => {
 });
 
 document.getElementById("invTool").addEventListener("click", () => notify({ type:"warn", title:"Not wired", message:"Inventory Management (wire later)" }));
-document.getElementById("parTool").addEventListener("click", () => notify({ type:"warn", title:"Not wired", message:"Par Level Management (wire later)" }));
-document.getElementById("histTool").addEventListener("click", () => notify({ type:"warn", title:"Not wired", message:"History (wire later)" }));
+
+parTool.addEventListener("click", openParModal);
+parTool.addEventListener("keydown", (e) => {
+  if(e.key === "Enter" || e.key === " "){
+    e.preventDefault();
+    openParModal();
+  }
+});
+
+parModalClose.addEventListener("click", closeParModal);
+parCancelBtn.addEventListener("click", closeParModal);
+parSaveBtn.addEventListener("click", saveParLevels);
+parModal.addEventListener("click", (e) => {
+  if(e.target === parModal) closeParModal();
+});
+
+histTool.addEventListener("click", openHistoryModal);
+histTool.addEventListener("keydown", (e) => {
+  if(e.key === "Enter" || e.key === " "){
+    e.preventDefault();
+    openHistoryModal();
+  }
+});
+
+historyModalClose.addEventListener("click", closeHistoryModal);
+historyModal.addEventListener("click", (e) => {
+  if(e.target === historyModal) closeHistoryModal();
+});
+
+historySearchBtn.addEventListener("click", () => {
+  refineHistoryFromCache(historySearchInput.value);
+});
+
+historyResetBtn.addEventListener("click", () => {
+  historySearchInput.value = "";
+  renderHistoryRows(HISTORY_CACHE);
+  notify({ type:"success", title:"History reset", message:`Showing full IPU ${IPU_ID} history`, ms: 1400 });
+});
+
+historySearchInput.addEventListener("keydown", (e) => {
+  if(e.key === "Enter"){
+    e.preventDefault();
+    refineHistoryFromCache(historySearchInput.value);
+  }
+});
+
+document.addEventListener("keydown", (e) => {
+  if(e.key === "Escape"){
+    if(parModal.classList.contains("show")) closeParModal();
+    if(historyModal.classList.contains("show")) closeHistoryModal();
+  }
+});
 
 renderQueue();
 loadItems();
