@@ -166,24 +166,78 @@ main{
   color: rgba(15,23,42,.60);
   letter-spacing:.2px;
 }
-.ui-input, .ui-select{
+
+.ui-input{
   width:100%;
-  height:38px;
-  border-radius:12px;
+  height:42px;
+  border-radius:14px;
   border:1px solid var(--line);
-  background: var(--surfaceSolid);
-  padding: 0 12px;
+  background: linear-gradient(180deg, rgba(255,255,255,1), rgba(250,252,255,1));
+  padding: 0 14px;
   outline:none;
   font-size:12px;
-  color: rgba(15,23,42,.78);
+  color: rgba(15,23,42,.80);
   font-weight:800;
-  transition: border-color .16s var(--ease), box-shadow .16s var(--ease);
+  transition: border-color .16s var(--ease), box-shadow .16s var(--ease), transform .16s var(--ease), background .16s var(--ease);
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.85), 0 1px 2px rgba(16,24,40,.04);
 }
-.ui-input:hover, .ui-select:hover{ border-color: rgba(15,23,42,.18); }
-.ui-input:focus, .ui-select:focus{
+.ui-input:hover{
+  border-color: rgba(15,23,42,.18);
+  background: linear-gradient(180deg, rgba(255,255,255,1), rgba(248,250,253,1));
+}
+.ui-input:focus{
   border-color: rgba(var(--teal-rgb), .55);
-  box-shadow: 0 0 0 4px var(--focus);
+  box-shadow: 0 0 0 4px var(--focus), inset 0 1px 0 rgba(255,255,255,.85);
 }
+
+.select-shell{
+  position:relative;
+}
+.select-shell::after{
+  content:"";
+  position:absolute;
+  right:14px;
+  top:50%;
+  width:10px;
+  height:10px;
+  border-right:2px solid rgba(15,23,42,.46);
+  border-bottom:2px solid rgba(15,23,42,.46);
+  transform: translateY(-65%) rotate(45deg);
+  pointer-events:none;
+  transition: transform .16s var(--ease), border-color .16s var(--ease);
+}
+.select-shell:focus-within::after{
+  border-color: rgba(var(--teal-rgb), .9);
+  transform: translateY(-55%) rotate(45deg);
+}
+.ui-select{
+  width:100%;
+  height:42px;
+  border-radius:14px;
+  border:1px solid var(--line);
+  background:
+    linear-gradient(180deg, rgba(255,255,255,1), rgba(250,252,255,1));
+  padding: 0 40px 0 14px;
+  outline:none;
+  font-size:12px;
+  color: rgba(15,23,42,.80);
+  font-weight:800;
+  transition: border-color .16s var(--ease), box-shadow .16s var(--ease), transform .16s var(--ease), background .16s var(--ease);
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.85), 0 1px 2px rgba(16,24,40,.04);
+  appearance:none;
+  -webkit-appearance:none;
+  -moz-appearance:none;
+  cursor:pointer;
+}
+.ui-select:hover{
+  border-color: rgba(15,23,42,.18);
+  background: linear-gradient(180deg, rgba(255,255,255,1), rgba(248,250,253,1));
+}
+.ui-select:focus{
+  border-color: rgba(var(--teal-rgb), .55);
+  box-shadow: 0 0 0 4px var(--focus), inset 0 1px 0 rgba(255,255,255,.85);
+}
+.ui-select::-ms-expand{ display:none; }
 
 .segmented{
   display:flex;
@@ -229,7 +283,7 @@ main{
   font-weight:1000;
   cursor:pointer;
   box-shadow: 0 1px 2px rgba(16,24,40,.05);
-  transition: border-color .18s var(--ease), background .18s var(--ease), transform .18s var(--ease), box-shadow .18s var(--ease);
+  transition: border-color .18s var(--ease), background .18s var(--ease), transform .18s var(--ease), box-shadow .18s var(--ease), opacity .18s var(--ease);
 }
 .enter-btn:hover{ border-color: var(--line2); background: rgba(var(--teal-rgb), .94); transform: translateY(-1px); box-shadow:0 10px 18px rgba(16,24,40,.06); }
 .enter-btn:disabled{ opacity:.55; cursor:not-allowed; transform:none; box-shadow:none; }
@@ -251,9 +305,10 @@ main{
   color:white;
   font-weight:1000;
   cursor:pointer;
-  transition: transform .18s var(--ease), box-shadow .18s var(--ease);
+  transition: transform .18s var(--ease), box-shadow .18s var(--ease), opacity .18s var(--ease);
 }
 .danger-btn:hover{ transform:translateY(-1px); box-shadow:0 10px 18px rgba(16,24,40,.06); }
+.danger-btn:disabled{ opacity:.55; cursor:not-allowed; transform:none; box-shadow:none; }
 
 .hidden{ display:none !important; }
 
@@ -398,6 +453,158 @@ main{
   color: rgba(127,29,29,1);
 }
 
+.modal-backdrop{
+  position:fixed;
+  inset:0;
+  background: rgba(15,23,42,.46);
+  backdrop-filter: blur(6px);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  padding:18px;
+  z-index:10000;
+  opacity:0;
+  pointer-events:none;
+  transition: opacity .2s var(--ease);
+}
+.modal-backdrop.show{
+  opacity:1;
+  pointer-events:auto;
+}
+.modal-card{
+  width:min(520px, 100%);
+  border-radius:20px;
+  border:1px solid rgba(15,23,42,.10);
+  background:
+    linear-gradient(180deg, rgba(255,255,255,.98), rgba(249,250,252,.98));
+  box-shadow: 0 24px 60px rgba(15,23,42,.18);
+  padding:16px;
+  transform: translateY(10px) scale(.985);
+  transition: transform .22s var(--ease), border-color .18s var(--ease), box-shadow .18s var(--ease);
+}
+.modal-backdrop.show .modal-card{
+  transform: translateY(0) scale(1);
+}
+.modal-card.danger{
+  border-color: rgba(239,68,68,.22);
+  box-shadow: 0 24px 60px rgba(127,29,29,.16);
+}
+.modal-head{
+  display:flex;
+  align-items:flex-start;
+  justify-content:space-between;
+  gap:12px;
+  margin-bottom:10px;
+}
+.modal-title{
+  font-size:16px;
+  font-weight:1000;
+  color: rgba(15,23,42,.84);
+}
+.modal-close{
+  width:34px;
+  height:34px;
+  border:none;
+  border-radius:10px;
+  background: rgba(15,23,42,.05);
+  color: rgba(15,23,42,.65);
+  font-size:18px;
+  font-weight:900;
+  cursor:pointer;
+  transition: background .16s var(--ease), transform .16s var(--ease);
+}
+.modal-close:hover{
+  background: rgba(15,23,42,.09);
+  transform: translateY(-1px);
+}
+.modal-message{
+  font-size:14px;
+  font-weight:900;
+  color: rgba(15,23,42,.78);
+  line-height:1.45;
+}
+.modal-note{
+  margin-top:4px;
+  font-size:11px;
+  font-weight:800;
+  color: rgba(15,23,42,.52);
+}
+.detail-card{
+  margin-top:12px;
+  border:1px solid rgba(15,23,42,.08);
+  background: rgba(255,255,255,.82);
+  border-radius:16px;
+  padding:10px 12px;
+}
+.detail-row{
+  display:flex;
+  justify-content:space-between;
+  gap:12px;
+  padding:8px 0;
+  border-bottom:1px solid rgba(15,23,42,.06);
+}
+.detail-row:last-child{
+  border-bottom:none;
+}
+.detail-label{
+  font-size:11px;
+  font-weight:1000;
+  color: rgba(15,23,42,.54);
+  text-transform:uppercase;
+  letter-spacing:.35px;
+}
+.detail-value{
+  font-size:12px;
+  font-weight:900;
+  color: rgba(15,23,42,.78);
+  text-align:right;
+  word-break:break-word;
+}
+.modal-actions{
+  display:flex;
+  justify-content:flex-end;
+  gap:8px;
+  margin-top:14px;
+}
+.modal-cancel{
+  height:38px;
+  min-width:96px;
+  padding:0 14px;
+  border-radius:12px;
+  border:1px solid rgba(15,23,42,.10);
+  background:#fff;
+  color: rgba(15,23,42,.76);
+  font-weight:1000;
+  cursor:pointer;
+}
+.modal-cancel:hover{
+  border-color: var(--line2);
+}
+.modal-confirm{
+  height:38px;
+  min-width:120px;
+  padding:0 14px;
+  border-radius:12px;
+  border:1px solid rgba(15,23,42,.10);
+  background: rgba(var(--teal-rgb), .88);
+  color:#fff;
+  font-weight:1000;
+  cursor:pointer;
+}
+.modal-confirm:hover{
+  background: rgba(var(--teal-rgb), .96);
+}
+.modal-confirm.danger{
+  background: rgba(239,68,68,.90);
+}
+.modal-confirm.danger:hover{
+  background: rgba(239,68,68,.98);
+}
+.modal-confirm:disabled{
+  opacity:.55;
+  cursor:not-allowed;
+}
+
 @media (max-width: 980px){
   .grid{ grid-template-columns:1fr; }
   .toolbar{ grid-template-columns:1fr; }
@@ -488,12 +695,16 @@ main{
 
           <div class="field-group">
             <label class="field-label" for="addItem">Item Type</label>
-            <select id="addItem" class="ui-select"></select>
+            <div class="select-shell">
+              <select id="addItem" class="ui-select"></select>
+            </div>
           </div>
 
           <div class="field-group">
             <label class="field-label" for="addLocation">Location</label>
-            <select id="addLocation" class="ui-select"></select>
+            <div class="select-shell">
+              <select id="addLocation" class="ui-select"></select>
+            </div>
           </div>
 
           <div class="action-row">
@@ -509,7 +720,9 @@ main{
 
           <div class="field-group">
             <label class="field-label" for="moveLocation">New Location</label>
-            <select id="moveLocation" class="ui-select"></select>
+            <div class="select-shell">
+              <select id="moveLocation" class="ui-select"></select>
+            </div>
           </div>
 
           <div class="action-row">
@@ -541,7 +754,9 @@ main{
 
       <div class="toolbar">
         <input id="searchBox" class="ui-input" placeholder="Search asset number or item" />
-        <select id="locationFilter" class="ui-select"></select>
+        <div class="select-shell">
+          <select id="locationFilter" class="ui-select"></select>
+        </div>
         <button class="enter-btn" id="searchBtn" type="button">Search</button>
       </div>
 
@@ -571,6 +786,27 @@ main{
     </section>
   </div>
 </main>
+
+<div id="confirmModal" class="modal-backdrop" aria-hidden="true">
+  <div id="confirmCard" class="modal-card" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+    <div class="modal-head">
+      <div>
+        <div id="modalTitle" class="modal-title">Confirm Action</div>
+        <div id="modalNote" class="modal-note"></div>
+      </div>
+      <button id="modalClose" class="modal-close" type="button" aria-label="Close">×</button>
+    </div>
+
+    <div id="modalMessage" class="modal-message"></div>
+
+    <div id="modalDetails" class="detail-card"></div>
+
+    <div class="modal-actions">
+      <button id="modalCancel" class="modal-cancel" type="button">Cancel</button>
+      <button id="modalConfirm" class="modal-confirm" type="button">Confirm</button>
+    </div>
+  </div>
+</div>
 
 <script>
 const EDGE_URL = "https://sosyqdgeqgfuclffmzgl.supabase.co/functions/v1/IPU_Inventory";
@@ -611,8 +847,19 @@ const addFields = document.getElementById("addFields");
 const moveFields = document.getElementById("moveFields");
 const deleteFields = document.getElementById("deleteFields");
 
+const confirmModal = document.getElementById("confirmModal");
+const confirmCard = document.getElementById("confirmCard");
+const modalTitle = document.getElementById("modalTitle");
+const modalNote = document.getElementById("modalNote");
+const modalMessage = document.getElementById("modalMessage");
+const modalDetails = document.getElementById("modalDetails");
+const modalConfirm = document.getElementById("modalConfirm");
+const modalCancel = document.getElementById("modalCancel");
+const modalClose = document.getElementById("modalClose");
+
 let toastTimer = null;
 let searchTimer = null;
+let deleteConfirmDelayTimer = null;
 let locationMap = {};
 let allAssets = [];
 let filteredDbCount = 0;
@@ -620,6 +867,7 @@ let totalDbCount = 0;
 let currentOffset = 0;
 let currentLimit = 100;
 let currentQuery = "";
+let currentModalConfirmAction = null;
 
 function notify(type, title, msg) {
   const iconMap = { success: "✓", warn: "!", error: "✕" };
@@ -631,6 +879,15 @@ function notify(type, title, msg) {
   ft.classList.add("show");
   clearTimeout(toastTimer);
   toastTimer = setTimeout(() => ft.classList.remove("show"), 2600);
+}
+
+function escapeHtml(value) {
+  return String(value ?? "")
+    .replaceAll("&", "&amp;")
+    .replaceAll("<", "&lt;")
+    .replaceAll(">", "&gt;")
+    .replaceAll('"', "&quot;")
+    .replaceAll("'", "&#39;");
 }
 
 async function callEdge(payload) {
@@ -687,6 +944,54 @@ function updatePager() {
   pageInfo.textContent = `Page ${currentPage} of ${totalPages}`;
   prevBtn.disabled = currentOffset === 0;
   nextBtn.disabled = currentOffset + currentLimit >= filteredDbCount;
+}
+
+function buildDetailsHtml(rows) {
+  return rows.map(row => `
+    <div class="detail-row">
+      <div class="detail-label">${escapeHtml(row.label)}</div>
+      <div class="detail-value">${escapeHtml(row.value)}</div>
+    </div>
+  `).join("");
+}
+
+function closeModal() {
+  clearTimeout(deleteConfirmDelayTimer);
+  currentModalConfirmAction = null;
+  modalConfirm.disabled = false;
+  modalConfirm.textContent = "Confirm";
+  modalConfirm.classList.remove("danger");
+  confirmCard.classList.remove("danger");
+  confirmModal.classList.remove("show");
+  confirmModal.setAttribute("aria-hidden", "true");
+}
+
+function openModal(config) {
+  clearTimeout(deleteConfirmDelayTimer);
+
+  modalTitle.textContent = config.title || "Confirm Action";
+  modalNote.textContent = config.note || "";
+  modalMessage.textContent = config.message || "";
+  modalDetails.innerHTML = buildDetailsHtml(config.details || []);
+  modalConfirm.textContent = config.confirmText || "Confirm";
+
+  const isDanger = !!config.danger;
+  modalConfirm.classList.toggle("danger", isDanger);
+  confirmCard.classList.toggle("danger", isDanger);
+
+  currentModalConfirmAction = config.onConfirm || null;
+
+  if (isDanger && config.delayConfirmMs) {
+    modalConfirm.disabled = true;
+    deleteConfirmDelayTimer = setTimeout(() => {
+      modalConfirm.disabled = false;
+    }, config.delayConfirmMs);
+  } else {
+    modalConfirm.disabled = false;
+  }
+
+  confirmModal.classList.add("show");
+  confirmModal.setAttribute("aria-hidden", "false");
 }
 
 async function loadItemsAndLocations() {
@@ -773,10 +1078,10 @@ function renderTable() {
       `Location ${a.location_id}`;
 
     tr.innerHTML = `
-      <td>${a.asset_number || ""}</td>
-      <td>${a.items?.name || ""}</td>
-      <td>${locationName}</td>
-      <td>${a.location_id ?? ""}</td>
+      <td>${escapeHtml(a.asset_number || "")}</td>
+      <td>${escapeHtml(a.items?.name || "")}</td>
+      <td>${escapeHtml(locationName)}</td>
+      <td>${escapeHtml(a.location_id ?? "")}</td>
     `;
 
     tableBody.appendChild(tr);
@@ -813,22 +1118,13 @@ function renderTable() {
   updatePager();
 }
 
-async function addAsset() {
+async function addAssetConfirmed(asset_number, item_id, location_id) {
   try {
-    const asset_number = addAssetInput.value.trim();
-    const item_id = addItem.value;
-    const location_id = addLocation.value;
-
-    if (!asset_number || !item_id || !location_id) {
-      notify("warn", "Missing fields", "Complete all fields.");
-      return;
-    }
-
     const data = await callEdge({
       action: "create_asset",
       asset_number,
-      item_id: Number(item_id),
-      location_id: Number(location_id)
+      item_id,
+      location_id
     });
 
     if (data.status === "asset_number_taken") {
@@ -847,6 +1143,37 @@ async function addAsset() {
     console.error(err);
     notify("error", "Add failed", String(err.message || err));
   }
+}
+
+function startAddAssetFlow() {
+  const asset_number = addAssetInput.value.trim();
+  const item_id = addItem.value;
+  const location_id = addLocation.value;
+
+  if (!asset_number || !item_id || !location_id) {
+    notify("warn", "Missing fields", "Complete all fields.");
+    return;
+  }
+
+  const itemName = addItem.options[addItem.selectedIndex]?.text || "";
+  const locationName = addLocation.options[addLocation.selectedIndex]?.text || "";
+
+  openModal({
+    title: "Confirm Add",
+    note: "Please review the asset details below.",
+    message: `Add ${asset_number} to inventory?`,
+    details: [
+      { label: "Asset Number", value: asset_number },
+      { label: "Item Type", value: itemName },
+      { label: "Location", value: locationName }
+    ],
+    confirmText: "Add Asset",
+    danger: false,
+    onConfirm: async () => {
+      closeModal();
+      await addAssetConfirmed(asset_number, Number(item_id), Number(location_id));
+    }
+  });
 }
 
 async function moveAsset() {
@@ -886,7 +1213,25 @@ async function moveAsset() {
   }
 }
 
-async function deleteAsset() {
+async function deleteAssetConfirmed(assetId, assetNumber) {
+  try {
+    await callEdge({
+      action: "delete_asset",
+      id: Number(assetId)
+    });
+
+    deleteAssetInput.value = "";
+
+    notify("success", "Asset deleted", assetNumber);
+    currentOffset = 0;
+    await loadTable();
+  } catch (err) {
+    console.error(err);
+    notify("error", "Delete failed", String(err.message || err));
+  }
+}
+
+async function startDeleteAssetFlow() {
   try {
     const asset_number = deleteAssetInput.value.trim();
 
@@ -905,19 +1250,30 @@ async function deleteAsset() {
       return;
     }
 
-    await callEdge({
-      action: "delete_asset",
-      id: Number(existing.asset.id)
+    const asset = existing.asset;
+    const itemName = asset.items?.name || "";
+    const locationName = asset.locations?.name || locationMap[String(asset.location_id)] || "";
+
+    openModal({
+      title: "Confirm Delete",
+      note: "This action permanently removes the asset from inventory.",
+      message: `Are you sure you want to delete ${asset.asset_number}? This cannot be undone.`,
+      details: [
+        { label: "Asset Number", value: asset.asset_number || "" },
+        { label: "Item Type", value: itemName || "—" },
+        { label: "Location", value: locationName || "—" }
+      ],
+      confirmText: "Delete Asset",
+      danger: true,
+      delayConfirmMs: 900,
+      onConfirm: async () => {
+        closeModal();
+        await deleteAssetConfirmed(asset.id, asset.asset_number);
+      }
     });
-
-    deleteAssetInput.value = "";
-
-    notify("success", "Asset deleted", asset_number);
-    currentOffset = 0;
-    await loadTable();
   } catch (err) {
     console.error(err);
-    notify("error", "Delete failed", String(err.message || err));
+    notify("error", "Delete lookup failed", String(err.message || err));
   }
 }
 
@@ -927,9 +1283,9 @@ function triggerSearchNow() {
   loadTable();
 }
 
-document.getElementById("addBtn").addEventListener("click", addAsset);
+document.getElementById("addBtn").addEventListener("click", startAddAssetFlow);
 document.getElementById("moveBtn").addEventListener("click", moveAsset);
-document.getElementById("deleteBtn").addEventListener("click", deleteAsset);
+document.getElementById("deleteBtn").addEventListener("click", startDeleteAssetFlow);
 
 document.getElementById("searchBtn").addEventListener("click", () => {
   triggerSearchNow();
@@ -970,6 +1326,27 @@ nextBtn.addEventListener("click", async () => {
 
 segButtons.forEach(btn => {
   btn.addEventListener("click", () => setMode(btn.dataset.mode));
+});
+
+modalCancel.addEventListener("click", closeModal);
+modalClose.addEventListener("click", closeModal);
+
+confirmModal.addEventListener("click", (e) => {
+  if (e.target === confirmModal) {
+    closeModal();
+  }
+});
+
+document.addEventListener("keydown", (e) => {
+  if (e.key === "Escape" && confirmModal.classList.contains("show")) {
+    closeModal();
+  }
+});
+
+modalConfirm.addEventListener("click", async () => {
+  if (typeof currentModalConfirmAction === "function") {
+    await currentModalConfirmAction();
+  }
 });
 
 (async function init() {
