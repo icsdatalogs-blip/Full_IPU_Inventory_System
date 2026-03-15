@@ -1,16 +1,3 @@
-// ============================================================
-// SUPABASE EDGE FUNCTION — INVENTORY ADMIN
-// supports:
-// - list_items
-// - list_locations
-// - search_assets
-// - get_asset
-// - create_asset
-// - update_asset
-// - move_asset
-// - delete_asset
-// ============================================================
-
 import "jsr:@supabase/functions-js/edge-runtime.d.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 
@@ -49,10 +36,7 @@ function badRequest(message: string) {
   return json({ status: "error", error: message }, 400);
 }
 
-async function getAssetByIdOrNumber(params: {
-  id?: unknown;
-  asset_number?: unknown;
-}) {
+async function getAssetByIdOrNumber(params: { id?: unknown; asset_number?: unknown }) {
   const id = toPositiveInt(params.id);
   const asset_number = cleanString(params.asset_number);
 
@@ -68,8 +52,8 @@ async function getAssetByIdOrNumber(params: {
       asset_number,
       serial_number,
       location_id,
-      items ( id, name ),
-      locations ( id, name )
+      items:items!assets_item_id_fkey ( id, name ),
+      locations:locations!assets_location_id_fkey ( id, name )
     `);
 
   if (id) {
@@ -144,19 +128,32 @@ Deno.serve(async (req: Request) => {
 
     // ======================================================
     // SEARCH ASSETS
-    // FULL backend search + pagination
-    // - location filter in backend
-    // - q search in backend
-    // - returns filtered_count + total_count
+    // backend search + backend pagination
     // ======================================================
     if (action === "search_assets") {
       const location_id = toPositiveInt(body.location_id);
-      const q = cleanString(body.q);
+      const q = cleanString(body.q).toLowerCase();
 
       const limit = toPositiveInt(body.limit) ?? 100;
       const rawOffset = Number(body.offset);
       const offset =
         Number.isFinite(rawOffset) && rawOffset >= 0 ? Math.floor(rawOffset) : 0;
+
+      // If q exists, find matching item IDs first.
+      let matchingItemIds: number[] = [];
+
+      if (q) {
+        const { data: itemMatches, error: itemMatchError } = await supabase
+          .from("items")
+          .select("id")
+          .ilike("name", `%${q}%`);
+
+        if (itemMatchError) throw new Error(itemMatchError.message);
+
+        matchingItemIds = (itemMatches ?? [])
+          .map((x) => Number(x.id))
+          .filter((n) => Number.isInteger(n) && n > 0);
+      }
 
       let query = supabase
         .from("assets")
@@ -178,7 +175,13 @@ Deno.serve(async (req: Request) => {
       }
 
       if (q) {
-        query = query.or(`asset_number.ilike.%${q}%,items.name.ilike.%${q}%`);
+        if (matchingItemIds.length > 0) {
+          query = query.or(
+            `asset_number.ilike.%${q}%,item_id.in.(${matchingItemIds.join(",")})`
+          );
+        } else {
+          query = query.ilike("asset_number", `%${q}%`);
+        }
       }
 
       const { data, count: filteredCount, error } = await query
@@ -187,9 +190,15 @@ Deno.serve(async (req: Request) => {
 
       if (error) throw new Error(error.message);
 
-      const { count: totalCount, error: totalError } = await supabase
+      let totalCountQuery = supabase
         .from("assets")
         .select("*", { count: "exact", head: true });
+
+      if (location_id) {
+        totalCountQuery = totalCountQuery.eq("location_id", location_id);
+      }
+
+      const { count: totalCount, error: totalError } = await totalCountQuery;
 
       if (totalError) throw new Error(totalError.message);
 
@@ -201,8 +210,33 @@ Deno.serve(async (req: Request) => {
         returned_count: Array.isArray(data) ? data.length : 0,
         offset,
         limit,
+        q,
       });
     }
+
+    // ======================================================
+    // GET ASSET
+    // ======================================================
+    if (action === "get_asset") {
+      const result = await getAssetByIdOrNumber({
+        id: body.id,
+        asset_number: body.asset_number,
+      });
+
+      if (result.error) {
+        return badRequest(result.error);
+      }
+
+      if (!result.asset) {
+        return json({ status: "not_found", asset: null }, 200);
+      }
+
+      return json({
+        status: "success",
+        asset: result.asset,
+      });
+    }
+
     // ======================================================
     // CREATE ASSET
     // ======================================================
@@ -250,8 +284,8 @@ Deno.serve(async (req: Request) => {
           asset_number,
           serial_number,
           location_id,
-          items ( id, name ),
-          locations ( id, name )
+          items:items!assets_item_id_fkey ( id, name ),
+          locations:locations!assets_location_id_fkey ( id, name )
         `)
         .single();
 
@@ -322,8 +356,8 @@ Deno.serve(async (req: Request) => {
           asset_number,
           serial_number,
           location_id,
-          items ( id, name ),
-          locations ( id, name )
+          items:items!assets_item_id_fkey ( id, name ),
+          locations:locations!assets_location_id_fkey ( id, name )
         `)
         .single();
 
@@ -368,8 +402,8 @@ Deno.serve(async (req: Request) => {
           asset_number,
           serial_number,
           location_id,
-          items ( id, name ),
-          locations ( id, name )
+          items:items!assets_item_id_fkey ( id, name ),
+          locations:locations!assets_location_id_fkey ( id, name )
         `)
         .single();
 

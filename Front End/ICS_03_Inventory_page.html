@@ -540,7 +540,7 @@ main{
       </div>
 
       <div class="toolbar">
-        <input id="searchBox" class="ui-input" placeholder="Search asset number" />
+        <input id="searchBox" class="ui-input" placeholder="Search asset number or item" />
         <select id="locationFilter" class="ui-select"></select>
         <button class="enter-btn" id="searchBtn" type="button">Search</button>
       </div>
@@ -612,12 +612,14 @@ const moveFields = document.getElementById("moveFields");
 const deleteFields = document.getElementById("deleteFields");
 
 let toastTimer = null;
+let searchTimer = null;
 let locationMap = {};
 let allAssets = [];
 let filteredDbCount = 0;
 let totalDbCount = 0;
 let currentOffset = 0;
 let currentLimit = 100;
+let currentQuery = "";
 
 function notify(type, title, msg) {
   const iconMap = { success: "✓", warn: "!", error: "✕" };
@@ -718,11 +720,15 @@ async function loadItemsAndLocations() {
 async function loadTable() {
   try {
     const location_id = locationFilter.value || null;
+    const q = searchBox.value.trim();
+
+    currentQuery = q;
 
     const payload = {
       action: "search_assets",
       limit: currentLimit,
-      offset: currentOffset
+      offset: currentOffset,
+      q
     };
 
     if (location_id) {
@@ -742,6 +748,8 @@ async function loadTable() {
     emptyState.classList.remove("hidden");
     emptyState.textContent = "Failed to load assets.";
     resultCount.textContent = "0 of 0";
+    filteredDbCount = 0;
+    totalDbCount = 0;
     updatePager();
     notify("error", "Load failed", String(err.message || err));
   }
@@ -750,22 +758,14 @@ async function loadTable() {
 function renderTable() {
   tableBody.innerHTML = "";
 
-  const q = searchBox.value.trim().toLowerCase();
-
-  const filtered = allAssets.filter(a => {
-    const asset = (a.asset_number || "").toLowerCase();
-    const item = (a.items?.name || "").toLowerCase();
-    return !q || asset.includes(q) || item.includes(q);
-  });
-
-  if (!filtered.length) {
+  if (!allAssets.length) {
     emptyState.classList.remove("hidden");
     emptyState.textContent = "No assets found.";
   } else {
     emptyState.classList.add("hidden");
   }
 
-  filtered.forEach(a => {
+  allAssets.forEach(a => {
     const tr = document.createElement("tr");
     const locationName =
       a.locations?.name ||
@@ -782,22 +782,16 @@ function renderTable() {
     tableBody.appendChild(tr);
   });
 
-  if (!q) {
-    if (filteredDbCount === 0) {
-      resultCount.textContent = `0 of ${totalDbCount}`;
-      updatePager();
-      return;
-    }
+  if (filteredDbCount === 0) {
+    resultCount.textContent = `0 of ${totalDbCount}`;
+    updatePager();
+    return;
+  }
 
-    const start = currentOffset + 1;
-    const end = Math.min(currentOffset + allAssets.length, filteredDbCount);
+  const start = currentOffset + 1;
+  const end = Math.min(currentOffset + allAssets.length, filteredDbCount);
 
-    if (currentOffset === 0 && filteredDbCount === totalDbCount && allAssets.length === totalDbCount) {
-      resultCount.textContent = `${totalDbCount} of ${totalDbCount}`;
-      updatePager();
-      return;
-    }
-
+  if (!currentQuery) {
     if (start === end) {
       resultCount.textContent = `${end} of ${filteredDbCount} · total ${totalDbCount}`;
       updatePager();
@@ -809,7 +803,13 @@ function renderTable() {
     return;
   }
 
-  resultCount.textContent = `${filtered.length} of ${filteredDbCount} · total ${totalDbCount}`;
+  if (start === end) {
+    resultCount.textContent = `${end} of ${filteredDbCount} matching · total ${totalDbCount}`;
+    updatePager();
+    return;
+  }
+
+  resultCount.textContent = `${start}-${end} of ${filteredDbCount} matching · total ${totalDbCount}`;
   updatePager();
 }
 
@@ -921,17 +921,40 @@ async function deleteAsset() {
   }
 }
 
+function triggerSearchNow() {
+  clearTimeout(searchTimer);
+  currentOffset = 0;
+  loadTable();
+}
+
 document.getElementById("addBtn").addEventListener("click", addAsset);
 document.getElementById("moveBtn").addEventListener("click", moveAsset);
 document.getElementById("deleteBtn").addEventListener("click", deleteAsset);
-document.getElementById("searchBtn").addEventListener("click", renderTable);
+
+document.getElementById("searchBtn").addEventListener("click", () => {
+  triggerSearchNow();
+});
 
 locationFilter.addEventListener("change", async () => {
   currentOffset = 0;
   await loadTable();
 });
 
-searchBox.addEventListener("input", renderTable);
+searchBox.addEventListener("input", () => {
+  clearTimeout(searchTimer);
+
+  searchTimer = setTimeout(async () => {
+    currentOffset = 0;
+    await loadTable();
+  }, 300);
+});
+
+searchBox.addEventListener("keydown", async (e) => {
+  if (e.key === "Enter") {
+    e.preventDefault();
+    triggerSearchNow();
+  }
+});
 
 prevBtn.addEventListener("click", async () => {
   if (currentOffset === 0) return;
