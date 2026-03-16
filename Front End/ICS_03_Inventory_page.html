@@ -819,7 +819,7 @@ function renderTable() {
 
 async function addAsset() {
   try {
-    const asset_number = addAssetInput.value.trim();
+    const asset_number = addAssetInput.value.trim().toUpperCase();
     const item_id = addItem.value;
     const location_id = addLocation.value;
 
@@ -855,7 +855,7 @@ async function addAsset() {
 
 async function moveAsset() {
   try {
-    const asset_number = moveAssetInput.value.trim();
+    const asset_number = moveAssetInput.value.trim().toUpperCase();
     const location_id = moveLocation.value;
 
     if (!asset_number || !location_id) {
@@ -892,7 +892,7 @@ async function moveAsset() {
 
 async function deleteAsset() {
   try {
-    const asset_number = deleteAssetInput.value.trim();
+    const asset_number = deleteAssetInput.value.trim().toUpperCase();
 
     if (!asset_number) {
       notify("warn", "Missing asset", "Enter asset number.");

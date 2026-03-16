@@ -1105,7 +1105,7 @@ function toastForResult(scan_type, asset, result){
    SCAN FLOW
 ============================================================ */
 async function runScan(scan_type){
-  const asset = assetInput.value.trim();
+  const asset = assetInput.value.trim().toUpperCase();
   if (!asset) return;
 
   showToast({
