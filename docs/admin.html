@@ -1514,7 +1514,7 @@ async function sendScan(asset_number, ipu_id, scan_type) {
 }
 
 async function runScan(scan_type){
-  const asset = assetInput.value.trim();
+  const asset = assetInput.value.trim().toUpperCase();
   if(!asset) return;
 
   notify({
