@@ -737,9 +737,10 @@ const CONTRACT = {
 ============================================================ */
  const qs = new URLSearchParams(location.search);
 const IPU_ID = Number(qs.get("ipu_id") || 1);
-const ipuName = qs.get("name") || "Dayton IPU";
-const ipuAddress = qs.get("address") || "324 Wilmington Ave., Dayton, OH 45420";
-
+const qs = new URLSearchParams(location.search);
+const IPU_ID = Number(qs.get("ipu_id") || 1);
+const ipuName = qs.get("name") || "Unknown IPU";
+const ipuAddress = qs.get("address") || "Address unavailable";
 const ipuNameEl = document.getElementById("ipuName");
 const ipuAddressEl = document.getElementById("ipuAddress");
 
