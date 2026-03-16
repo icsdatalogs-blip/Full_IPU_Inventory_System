@@ -1790,7 +1790,9 @@ assetInput.addEventListener("keydown", async (e) => {
   await runScan(scan_type);
 });
 
-document.getElementById("invTool").addEventListener("click", () => notify({ type:"warn", title:"Not wired", message:"Inventory Management (wire later)" }));
+document.getElementById("invTool").addEventListener("click", () => {
+  window.location.href = "inventory.html?ipu_id=" + IPU_ID;
+});
 
 parTool.addEventListener("click", openParModal);
 parTool.addEventListener("keydown", (e) => {
