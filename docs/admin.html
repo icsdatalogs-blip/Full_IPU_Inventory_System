@@ -1,0 +1,1855 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Admin Portal</title>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+
+<style>
+:root{
+  --bgTop:#ffffff; --bgBot:#f4f6f9;
+
+  --ink: rgba(15,23,42,.82);
+  --ink2: rgba(15,23,42,.72);
+  --muted: rgba(15,23,42,.55);
+  --muted2: rgba(15,23,42,.45);
+
+  --teal-rgb: 20,137,168;
+  --orange-rgb: 243,112,33;
+
+  --surface: rgba(255,255,255,.94);
+  --surfaceSolid:#ffffff;
+
+  --line: rgba(15, 23, 42, .10);
+  --line2: rgba(15, 23, 42, .16);
+  --shadow: 0 1px 2px rgba(16,24,40,.05), 0 10px 25px rgba(16,24,40,.06);
+
+  --radius: 18px;
+  --ease: cubic-bezier(.2,.8,.2,1);
+  --focus: rgba(var(--teal-rgb), .18);
+
+  --okBg: rgba(34,197,94,.14);
+  --okBorder: rgba(34,197,94,.45);
+  --okInk: rgba(21,128,61,1);
+
+  --neutralBg: rgba(148,163,184,.18);
+  --neutralBorder: rgba(148,163,184,.45);
+  --neutralInk: rgba(51,65,85,1);
+
+  --warnBg: rgba(245,158,11,.16);
+  --warnBorder: rgba(245,158,11,.45);
+  --warnInk: rgba(161,98,7,1);
+
+  --badBg: rgba(239,68,68,.14);
+  --badBorder: rgba(239,68,68,.45);
+  --badInk: rgba(153,27,27,1);
+
+  --rowH: 22px;
+  --btnH: 20px;
+}
+
+*{ box-sizing:border-box; font-family: Inter, system-ui, -apple-system, BlinkMacSystemFont, sans-serif; }
+html, body { height: 100%; }
+
+body{
+  margin:0;
+  color: var(--ink);
+  background: linear-gradient(to bottom, var(--bgTop) 0%, var(--bgTop) 200px, var(--bgBot) 200px, var(--bgBot) 100%);
+  overflow:hidden;
+}
+
+/* Header */
+header{
+  text-align:center;
+  padding: 26px 18px 10px;
+  position:relative;
+  overflow:hidden;
+}
+.header-sheen{
+  position:absolute; left:50%; top:12px; transform:translateX(-50%);
+  width:min(980px, 96vw); height:100px;
+  background: radial-gradient(360px 90px at 50% 45%,
+      rgba(255,255,255,0.92),
+      rgba(255,255,255,0.55) 55%,
+      rgba(255,255,255,0.0) 78%);
+  pointer-events:none; z-index:1;
+}
+.header-title,.header-sub,.header-tagline{ position:relative; z-index:2; }
+.header-title{ font-size:18px; font-weight:900; letter-spacing:.7px; color: var(--ink2); }
+.header-sub{ font-size:11px; margin-top:4px; letter-spacing:1px; color:rgba(0,0,0,.50); text-transform:uppercase; font-weight:800; }
+.header-tagline{ margin-top:6px; font-size:12px; color:rgba(0,0,0,.50); letter-spacing:.2px; font-weight:600; }
+
+.wave-layer{ position:absolute; bottom:34px; left:0; width:100%; height:120px; pointer-events:none; z-index:0; }
+.wave-layer svg{ position:absolute; inset:0; width:120%; left:-10%; height:100%; display:block; opacity:.40; filter:saturate(1.02); }
+.wave-top{ transform: translateY(-8px); }
+.wave-mid{ transform: translateY(1px); }
+.wave-low{ transform: translateY(10px); }
+
+/* Main layout */
+main{
+  max-width: 1320px;
+  margin: 0 auto;
+  padding: 0 10px 10px;
+  height: calc(100vh - 136px);
+  display:flex;
+  flex-direction:column;
+  gap: 8px;
+  min-height:0;
+}
+
+.topbar{
+  display:flex;
+  align-items:flex-start;
+  justify-content:space-between;
+  gap:10px;
+  padding: 4px 4px 0;
+}
+.topbar-left{ display:flex; flex-direction:column; gap:4px; text-align:left; }
+
+.backlink-top{
+  display:inline-flex; align-items:center; gap:10px;
+  text-decoration:none; color: rgba(15,23,42,.58);
+  font-weight:900; width: fit-content;
+  transition: color .16s var(--ease), transform .16s var(--ease);
+}
+.backlink-top:hover{ color: rgba(15,23,42,.70); transform: translateY(-1px); }
+.backlink-top:active{ transform: translateY(0px); }
+.backlink-top:focus-visible{ outline:none; box-shadow:0 0 0 4px var(--focus); border-radius:12px; padding:6px 8px; }
+
+.orgline{ font-size:12px; font-weight:900; color: var(--muted); }
+.addrline{ margin-top:0px; font-size:11px; color: var(--muted2); font-weight:700; }
+
+.pill-lite{
+  display:inline-flex; align-items:center; justify-content:center;
+  height:34px; padding:0 10px;
+  border-radius:12px;
+  border:1px solid var(--line);
+  background: rgba(255,255,255,.92);
+  box-shadow:0 1px 2px rgba(16,24,40,.06);
+  color: rgba(15,23,42,.62);
+  font-weight:900;
+  text-decoration:none;
+  gap:10px;
+  transition: border-color .18s var(--ease), transform .18s var(--ease), background .18s var(--ease), box-shadow .18s var(--ease);
+}
+.pill-lite:hover{ border-color: var(--line2); background: rgba(255,255,255,.98); transform: translateY(-1px); box-shadow:0 10px 18px rgba(16,24,40,.06); }
+.pill-lite:active{ transform: translateY(0px); }
+.pill-lite:focus-visible{ outline:none; box-shadow:0 0 0 4px var(--focus), 0 10px 18px rgba(16,24,40,.06); }
+
+.grid{
+  display:grid;
+  grid-template-columns: 1.35fr 1fr;
+  gap: 12px;
+  align-items:stretch;
+  padding: 0 4px;
+  flex: 1 1 auto;
+  min-height:0;
+}
+
+/* Cards */
+.ui-card{
+  background: var(--surface);
+  border:1px solid var(--line);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  padding: 10px;
+  position:relative;
+  min-height:0;
+}
+.ui-card::before{
+  content:""; position:absolute; inset:8px;
+  border-radius: calc(var(--radius) - 8px);
+  pointer-events:none;
+  background:
+    radial-gradient(70px 70px at 18% 20%, rgba(var(--orange-rgb),.10), transparent 65%),
+    radial-gradient(90px 90px at 78% 62%, rgba(var(--teal-rgb),.09), transparent 70%);
+  opacity:.85;
+}
+.ui-card > *{ position:relative; z-index:1; }
+
+.ui-card-title{
+  display:flex; align-items:center; justify-content:space-between;
+  gap:10px;
+  font-size:13px;
+  font-weight:900;
+  color: rgba(15,23,42,.74);
+  margin-bottom: 6px;
+}
+.ui-subtle{ font-size:11px; color: rgba(15,23,42,.52); font-weight:800; }
+
+/* LEFT */
+.left{
+  display:flex;
+  flex-direction:column;
+  gap: 10px;
+  min-height:0;
+}
+
+/* Scan card */
+#scanCard{
+  background: rgba(255,255,255,0.96);
+  border:1px solid rgba(var(--orange-rgb), 0.18);
+  box-shadow:
+    0 1px 2px rgba(16,24,40,.05),
+    0 10px 25px rgba(16,24,40,.06),
+    0 0 0 4px rgba(var(--orange-rgb), 0.040);
+}
+
+.scan-row{
+  display:grid;
+  grid-template-columns: 1fr auto;
+  gap:8px;
+  align-items:center;
+}
+
+.ui-input-wrap{ position:relative; }
+.ui-search{
+  position:absolute; left:10px; top:50%; transform:translateY(-50%);
+  opacity:.55; width:16px; height:16px;
+}
+.ui-input{
+  width:100%; height:36px;
+  border-radius:12px;
+  border:1px solid var(--line);
+  background: var(--surfaceSolid);
+  padding: 0 10px 0 36px;
+  outline:none;
+  font-size:12px;
+  color: rgba(15,23,42,.78);
+  font-weight:800;
+  transition: border-color .16s var(--ease), box-shadow .16s var(--ease);
+}
+.ui-input:hover{ border-color: rgba(15,23,42,.18); }
+.ui-input:focus{ border-color: rgba(var(--teal-rgb), .55); box-shadow: 0 0 0 4px var(--focus); }
+
+.enter-btn{
+  height:36px;
+  min-width: 92px;
+  padding:0 12px;
+  border-radius:12px;
+  border:1px solid rgba(15,23,42,.10);
+  background: rgba(var(--teal-rgb), .84);
+  color: rgba(15,23,42,.86);
+  font-weight:1000;
+  display:inline-flex; align-items:center; justify-content:center; gap:10px;
+  cursor:pointer;
+  box-shadow: 0 1px 2px rgba(16,24,40,.05);
+  transition: border-color .18s var(--ease), background .18s var(--ease), transform .18s var(--ease), box-shadow .18s var(--ease);
+}
+.enter-btn:hover{ border-color: var(--line2); background: rgba(var(--teal-rgb), .94); transform: translateY(-1px); box-shadow:0 10px 18px rgba(16,24,40,.06); }
+.enter-btn:active{ transform: translateY(0px); }
+.enter-btn:focus-visible{ outline:none; box-shadow: 0 0 0 4px var(--focus), 0 10px 18px rgba(16,24,40,.06); }
+.enter-btn:disabled{ opacity:.55; cursor:not-allowed; transform:none; box-shadow:none; }
+
+/* Table card */
+.table-card{
+  padding: 8px;
+  flex: 1 1 auto;
+  min-height:0;
+  display:flex;
+  flex-direction:column;
+}
+.table-head{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:10px;
+  margin-bottom:6px;
+}
+.table-wrap{
+  border:1px solid rgba(15,23,42,.08);
+  border-radius:14px;
+  background: rgba(255,255,255,.78);
+  overflow:auto;
+  flex: 1 1 auto;
+  min-height:0;
+}
+
+.table{
+  width:100%;
+  border-collapse:collapse;
+  font-variant-numeric: tabular-nums;
+  table-layout:fixed;
+}
+
+.table thead th{
+  font-size:11px;
+  font-weight:1000;
+  color: rgba(15,23,42,.58);
+  padding: 6px 8px;
+  border-bottom:1px solid rgba(15,23,42,.10);
+  background: rgba(255,255,255,.86);
+  position: sticky;
+  top: 0;
+  z-index: 2;
+  vertical-align:middle;
+}
+
+.table tbody td{
+  height: var(--rowH);
+  padding: 0 8px;
+  border-bottom:1px solid rgba(15,23,42,.06);
+  font-size:11px;
+  font-weight:800;
+  color: rgba(15,23,42,.74);
+  line-height: 1;
+  vertical-align: middle;
+}
+.table tbody tr:last-child td{ border-bottom:none; }
+
+/* COLUMN SIZING / ALIGNMENT */
+.table th:nth-child(1),
+.table td:nth-child(1){
+  text-align:left;
+  overflow:hidden;
+  text-overflow:ellipsis;
+  white-space:nowrap;
+}
+
+.table th:nth-child(2),
+.table td:nth-child(2){
+  width:64px;
+  text-align:center;
+  padding-left:0;
+  padding-right:0;
+}
+
+.table th:nth-child(3),
+.table td:nth-child(3){
+  width:64px;
+  text-align:center;
+  padding-left:0;
+  padding-right:0;
+}
+
+.table th:nth-child(4),
+.table td:nth-child(4){
+  width:92px;
+  text-align:center;
+  padding-left:0;
+  padding-right:0;
+}
+
+.table td.actions{
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  gap:4px;
+}
+
+.action-btn{
+  width:26px;
+  height: var(--btnH);
+  border-radius:8px;
+  border:1px solid rgba(15,23,42,.14);
+  background: rgba(255,255,255,.86);
+  font-weight:1000;
+  cursor:pointer;
+  line-height: 1;
+  padding: 0;
+  margin:0;
+  flex: 0 0 auto;
+}
+.action-btn:hover{ border-color: rgba(var(--teal-rgb), .45); }
+.action-btn:active{ transform: translateY(1px); }
+
+td.qty.on.par-good{
+  color: var(--okInk);
+  background: rgba(34,197,94,.10);
+  border-radius: 0px;
+}
+td.qty.on.par-bad{
+  color: var(--badInk);
+  background: rgba(239,68,68,.10);
+  border-radius: 0px;
+}
+
+/* RIGHT */
+.right{
+  min-height:0;
+  display:grid;
+  grid-template-rows: auto 1fr;
+  gap: 10px;
+}
+
+.admin-list{ display:flex; flex-direction:column; gap:10px; }
+
+.tool-card{
+  display:flex; align-items:center; justify-content:space-between;
+  gap:12px;
+  padding: 14px 14px;
+  border-radius: 16px;
+  border:1px solid rgba(15,23,42,.10);
+  background: rgba(255,255,255,.86);
+  box-shadow: 0 1px 2px rgba(16,24,40,.05);
+  cursor:pointer;
+  transition: transform .16s var(--ease), box-shadow .16s var(--ease), border-color .16s var(--ease), background .16s var(--ease);
+}
+.tool-card:hover{
+  transform: translateY(-1px);
+  border-color: rgba(var(--teal-rgb), .35);
+  background: rgba(255,255,255,.94);
+  box-shadow: 0 10px 18px rgba(16,24,40,.06);
+}
+.tool-left{ display:flex; align-items:center; gap:12px; min-width:0; }
+
+.tool-icon{
+  width:40px;
+  height:40px;
+  border-radius:12px;
+  background: rgba(255,255,255,.96);
+  border:1px solid rgba(15,23,42,.08);
+  box-shadow: 0 6px 14px rgba(0,0,0,.05);
+  display:grid;
+  place-items:center;
+  flex:0 0 auto;
+  overflow:hidden;
+}
+
+.tool-icon-img{
+  width:22px;
+  height:22px;
+  object-fit:contain;
+  display:block;
+}
+
+.tool-title{ font-weight:1000; color: rgba(15,23,42,.78); font-size:15px; }
+.tool-sub{ font-size:11px; font-weight:800; color: rgba(15,23,42,.52); margin-top:2px; }
+.tool-text{ min-width:0; }
+.chev{ color: rgba(15,23,42,.42); font-weight:1000; font-size:22px; }
+
+.queue-card{
+  min-height:0;
+  display:flex;
+  flex-direction:column;
+  gap: 8px;
+}
+.queue-wrap{
+  border:1px solid rgba(15,23,42,.08);
+  border-radius:14px;
+  background: rgba(255,255,255,.78);
+  overflow:auto;
+  flex: 1 1 auto;
+  min-height:0;
+  padding: 8px;
+}
+.queue-empty{
+  border:1px dashed rgba(15,23,42,.18);
+  background: rgba(255,255,255,.60);
+  border-radius: 12px;
+  padding: 10px;
+  font-size:12px;
+  font-weight:900;
+  color: rgba(15,23,42,.55);
+}
+
+.q-item{
+  display:flex;
+  align-items:flex-start;
+  justify-content:space-between;
+  gap:10px;
+  border:1px solid rgba(15,23,42,.10);
+  background: rgba(255,255,255,.90);
+  border-radius: 12px;
+  padding: 8px 10px;
+  margin-bottom: 8px;
+}
+.q-item:last-child{ margin-bottom: 0; }
+
+.q-item.ok{
+  border-color: var(--okBorder);
+  background: rgba(34,197,94,.07);
+}
+.q-item.warn{
+  border-color: var(--warnBorder);
+  background: rgba(245,158,11,.07);
+}
+.q-item.bad{
+  border-color: var(--badBorder);
+  background: rgba(239,68,68,.06);
+}
+
+.q-left{ display:flex; gap:10px; min-width:0; }
+.q-icon{
+  width:26px; height:26px;
+  border-radius: 10px;
+  display:grid;
+  place-items:center;
+  flex: 0 0 auto;
+  border:1px solid rgba(15,23,42,.10);
+  background: rgba(255,255,255,.78);
+  font-weight:1000;
+}
+.q-icon.ok{
+  background: var(--okBg);
+  border-color: var(--okBorder);
+  color: var(--okInk);
+}
+.q-icon.neutral{
+  background: var(--neutralBg);
+  border-color: var(--neutralBorder);
+  color: var(--neutralInk);
+}
+.q-icon.warn{
+  background: var(--warnBg);
+  border-color: var(--warnBorder);
+  color: var(--warnInk);
+}
+.q-icon.bad{
+  background: var(--badBg);
+  border-color: var(--badBorder);
+  color: var(--badInk);
+}
+
+.q-text{ min-width:0; }
+.q-title{
+  font-size:12px;
+  font-weight:1000;
+  color: rgba(15,23,42,.78);
+  line-height: 1.2;
+  white-space: nowrap;
+  overflow:hidden;
+  text-overflow: ellipsis;
+  max-width: 100%;
+}
+.q-sub{
+  margin-top:2px;
+  font-size:11px;
+  font-weight:800;
+  color: rgba(15,23,42,.52);
+  line-height: 1.25;
+}
+
+.q-actions{
+  display:flex;
+  gap:8px;
+  flex: 0 0 auto;
+  align-items:center;
+}
+.q-btn{
+  height:28px;
+  padding:0 10px;
+  border-radius: 10px;
+  border:1px solid rgba(15,23,42,.12);
+  background: rgba(255,255,255,.86);
+  cursor:pointer;
+  font-weight:1000;
+  font-size:11px;
+  transition: transform .16s var(--ease), border-color .16s var(--ease);
+}
+.q-btn:hover{ transform: translateY(-1px); border-color: rgba(var(--teal-rgb), .35); }
+.q-btn:active{ transform: translateY(0px); }
+
+.queue-footer{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:10px;
+}
+.queue-meta{
+  font-size:11px;
+  font-weight:900;
+  color: rgba(15,23,42,.52);
+}
+
+.confirm-btn{
+  height:36px;
+  min-width: 150px;
+  padding:0 12px;
+  border-radius: 12px;
+  border:1px solid rgba(15,23,42,.10);
+  background: rgba(var(--teal-rgb), .30);
+  color: rgba(255,255,255,.85);
+  font-weight:1000;
+  cursor:not-allowed;
+  box-shadow: 0 1px 2px rgba(16,24,40,.05);
+  transition: background .18s var(--ease), transform .18s var(--ease), box-shadow .18s var(--ease);
+}
+.confirm-btn.enabled{
+  background: rgba(var(--teal-rgb), .92);
+  cursor:pointer;
+}
+.confirm-btn.enabled:hover{
+  transform: translateY(-1px);
+  box-shadow: 0 10px 18px rgba(16,24,40,.06);
+}
+.confirm-btn:active{ transform: translateY(0px); }
+.confirm-btn:focus-visible{ outline:none; box-shadow: 0 0 0 4px var(--focus), 0 10px 18px rgba(16,24,40,.06); }
+
+.float-toast{
+  position: fixed;
+  right: 16px;
+  top: 16px;
+  width: min(380px, calc(100vw - 32px));
+  border-radius: 14px;
+  border:1px solid var(--neutralBorder);
+  background: var(--neutralBg);
+  color: var(--neutralInk);
+  padding: 10px 12px;
+  display:flex;
+  align-items:flex-start;
+  gap:10px;
+  font-size:12px;
+  font-weight:800;
+  opacity:0;
+  transform: translateY(-10px);
+  pointer-events:none;
+  transition: opacity .26s var(--ease), transform .26s var(--ease), border-color .18s var(--ease), background .18s var(--ease), color .18s var(--ease);
+  z-index: 9999;
+  box-shadow: 0 10px 18px rgba(16,24,40,.10);
+}
+.float-toast.show{ opacity:1; transform: translateY(0); }
+.float-toast .icon{
+  width:22px; height:22px;
+  border-radius: 999px;
+  display:grid; place-items:center;
+  flex:0 0 auto;
+  border:1px solid var(--neutralBorder);
+  background: rgba(255,255,255,.60);
+  color: var(--neutralInk);
+  font-size:14px;
+  line-height:1;
+}
+.float-toast .t-title{ font-weight:1000; color: rgba(15,23,42,.82); }
+.float-toast .t-sub{ margin-top:2px; font-weight:800; color: rgba(15,23,42,.58); line-height:1.25; }
+
+.float-toast.pending{ border-color: var(--neutralBorder); background: var(--neutralBg); color: var(--neutralInk); }
+.float-toast.pending .icon{ border-color: var(--neutralBorder); color: var(--neutralInk); }
+
+.float-toast.success{ border-color: var(--okBorder); background: rgba(34,197,94,.10); color: rgba(20,83,45,1); }
+.float-toast.success .icon{ border-color: var(--okBorder); color: var(--okInk); background: var(--okBg); }
+
+.float-toast.warn{ border-color: var(--warnBorder); background: rgba(245,158,11,.10); color: rgba(120,72,0,1); }
+.float-toast.warn .icon{ border-color: var(--warnBorder); color: var(--warnInk); background: var(--warnBg); }
+
+.float-toast.error{ border-color: var(--badBorder); background: rgba(239,68,68,.10); color: rgba(127,29,29,1); }
+.float-toast.error .icon{ border-color: var(--badBorder); color: var(--badInk); background: var(--badBg); }
+
+/* Shared modal */
+.modal-overlay{
+  position: fixed;
+  inset: 0;
+  background: rgba(15,23,42,.20);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  display:none;
+  align-items:center;
+  justify-content:center;
+  padding: 18px;
+  z-index: 10050;
+}
+.modal-overlay.show{ display:flex; }
+
+.modal-card{
+  width:min(560px, 96vw);
+  max-height:min(82vh, 760px);
+  overflow:auto;
+  border-radius:16px;
+  border:1px solid rgba(15,23,42,.12);
+  background: rgba(255,255,255,.97);
+  box-shadow: 0 20px 60px rgba(15,23,42,.18);
+  padding:14px;
+}
+
+.modal-card.history-card{
+  width:min(1040px, 98vw);
+}
+
+.modal-head{
+  display:flex;
+  align-items:flex-start;
+  justify-content:space-between;
+  gap:12px;
+  margin-bottom:10px;
+}
+.modal-title{
+  font-size:14px;
+  font-weight:1000;
+  color: rgba(15,23,42,.80);
+}
+.modal-sub{
+  margin-top:3px;
+  font-size:11px;
+  font-weight:800;
+  color: rgba(15,23,42,.52);
+}
+.modal-close{
+  width:34px;
+  height:34px;
+  border-radius:10px;
+  border:1px solid rgba(15,23,42,.12);
+  background: rgba(255,255,255,.92);
+  cursor:pointer;
+  font-size:16px;
+  font-weight:1000;
+}
+.modal-close:hover{ border-color: rgba(var(--teal-rgb), .35); }
+
+/* Par modal */
+.par-list{
+  display:flex;
+  flex-direction:column;
+  gap:8px;
+}
+
+.par-row{
+  display:grid;
+  grid-template-columns: 1fr 96px;
+  gap:10px;
+  align-items:center;
+  border:1px solid rgba(15,23,42,.08);
+  border-radius:12px;
+  background: rgba(255,255,255,.88);
+  padding:10px;
+}
+.par-name{
+  font-size:12px;
+  font-weight:900;
+  color: rgba(15,23,42,.76);
+  min-width:0;
+}
+.par-input{
+  width:100%;
+  height:34px;
+  border-radius:10px;
+  border:1px solid var(--line);
+  background: #fff;
+  padding:0 10px;
+  outline:none;
+  font-size:12px;
+  font-weight:900;
+  color: rgba(15,23,42,.80);
+  text-align:center;
+}
+.par-input:focus{
+  border-color: rgba(var(--teal-rgb), .55);
+  box-shadow: 0 0 0 4px var(--focus);
+}
+
+.modal-actions{
+  display:flex;
+  justify-content:flex-end;
+  gap:8px;
+  margin-top:12px;
+}
+.modal-btn{
+  height:34px;
+  min-width:100px;
+  padding:0 12px;
+  border-radius:10px;
+  border:1px solid rgba(15,23,42,.12);
+  background: rgba(255,255,255,.90);
+  font-size:11px;
+  font-weight:1000;
+  cursor:pointer;
+}
+.modal-btn:hover{ border-color: rgba(var(--teal-rgb), .35); }
+.modal-btn.primary{
+  background: rgba(var(--teal-rgb), .92);
+  color: rgba(255,255,255,.95);
+  border-color: rgba(var(--teal-rgb), .50);
+}
+
+/* History modal */
+.history-controls{
+  display:grid;
+  grid-template-columns: 1fr auto auto;
+  gap:8px;
+  align-items:center;
+  margin-bottom:10px;
+}
+.history-btn{
+  height:36px;
+  min-width:96px;
+  padding:0 12px;
+  border-radius:12px;
+  border:1px solid rgba(15,23,42,.10);
+  background: rgba(255,255,255,.92);
+  color: rgba(15,23,42,.78);
+  font-weight:1000;
+  cursor:pointer;
+}
+.history-btn:hover{ border-color: rgba(var(--teal-rgb), .35); }
+
+.history-wrap{
+  border:1px solid rgba(15,23,42,.08);
+  border-radius:14px;
+  background: rgba(255,255,255,.78);
+  overflow:auto;
+  min-height:260px;
+  max-height:55vh;
+}
+
+.history-table{
+  width:100%;
+  border-collapse:collapse;
+  table-layout:fixed;
+  font-variant-numeric: tabular-nums;
+}
+.history-table thead th{
+  font-size:11px;
+  font-weight:1000;
+  color: rgba(15,23,42,.58);
+  padding: 8px;
+  border-bottom:1px solid rgba(15,23,42,.10);
+  background: rgba(255,255,255,.90);
+  position: sticky;
+  top: 0;
+  z-index: 2;
+  text-align:left;
+}
+.history-table tbody td{
+  padding: 8px;
+  border-bottom:1px solid rgba(15,23,42,.06);
+  font-size:11px;
+  font-weight:800;
+  color: rgba(15,23,42,.74);
+  vertical-align:top;
+}
+.history-table tbody tr:last-child td{ border-bottom:none; }
+
+.history-table th:nth-child(1),
+.history-table td:nth-child(1){ width:170px; }
+.history-table th:nth-child(2),
+.history-table td:nth-child(2){ width:130px; }
+.history-table th:nth-child(3),
+.history-table td:nth-child(3){ width:220px; }
+.history-table th:nth-child(4),
+.history-table td:nth-child(4){ width:120px; }
+.history-table th:nth-child(5),
+.history-table td:nth-child(5){ width:130px; }
+.history-table th:nth-child(6),
+.history-table td:nth-child(6){ width:100px; }
+
+.history-empty{
+  padding: 14px;
+  font-size:12px;
+  font-weight:900;
+  color: rgba(15,23,42,.55);
+}
+
+.status-chip{
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  min-height:24px;
+  padding:0 8px;
+  border-radius:999px;
+  border:1px solid var(--neutralBorder);
+  background: var(--neutralBg);
+  color: var(--neutralInk);
+  font-size:10px;
+  font-weight:1000;
+}
+.status-chip.ok{
+  border-color: var(--okBorder);
+  background: var(--okBg);
+  color: var(--okInk);
+}
+.status-chip.warn{
+  border-color: var(--warnBorder);
+  background: var(--warnBg);
+  color: var(--warnInk);
+}
+.status-chip.bad{
+  border-color: var(--badBorder);
+  background: var(--badBg);
+  color: var(--badInk);
+}
+
+@media (max-width: 980px){
+  body{ overflow:auto; }
+  main{ height:auto; min-height: calc(100vh - 130px); }
+  .grid{ grid-template-columns: 1fr; }
+  .right{ grid-template-rows: auto auto; }
+  .history-controls{ grid-template-columns: 1fr; }
+}
+
+@media (prefers-reduced-motion: reduce){
+  .tool-card, .pill-lite, .backlink-top, .enter-btn, .q-btn, .confirm-btn, .float-toast{ transition:none; }
+}
+</style>
+</head>
+
+<body>
+<header>
+  <div class="header-sheen"></div>
+
+  <div class="header-title">OHI • Innovative Care Solutions</div>
+  <div class="header-sub">Admin Control Panel</div>
+  <div class="header-tagline">Scan in · quick adjustments · management tools</div>
+
+  <div class="wave-layer" aria-hidden="true">
+    <svg class="wave-top" viewBox="0 0 1200 220" preserveAspectRatio="none">
+      <path d="M0,120 C70,10 140,210 210,120 C280,30 350,220 420,120 C490,10 560,210 630,120 C700,30 770,220 840,120 C910,10 980,210 1050,120 C1120,30 1160,180 1200,120"
+            fill="none" stroke="rgba(var(--orange-rgb),0.60)" stroke-width="22" stroke-linecap="round" />
+      <path d="M0,150 C90,40 180,240 270,150 C360,60 450,250 540,150 C630,40 720,240 810,150 C900,60 990,250 1080,150 C1140,120 1170,95 1200,80"
+            fill="none" stroke="rgba(var(--orange-rgb),0.30)" stroke-width="10" stroke-linecap="round" />
+    </svg>
+
+    <svg class="wave-mid" viewBox="0 0 1200 220" preserveAspectRatio="none">
+      <path d="M0,105 C80,210 160,0 240,105 C320,210 400,0 480,105 C560,210 640,0 720,105 C800,210 880,0 960,105 C1040,210 1120,0 1200,105"
+            fill="none" stroke="rgba(var(--teal-rgb),0.58)" stroke-width="12" stroke-linecap="round" />
+      <path d="M0,135 C90,240 180,30 270,135 C360,240 450,30 540,135 C630,240 720,30 810,135 C900,240 990,30 1080,135 C1140,175 1170,155 1200,145"
+            fill="none" stroke="rgba(var(--teal-rgb),0.32)" stroke-width="6" stroke-linecap="round" />
+      <path d="M0,92 C90,170 180,10 270,92 C360,170 450,10 540,92 C630,170 720,10 810,92 C900,170 990,10 1080,92 C1140,140 1170,125 1200,110"
+            fill="none" stroke="rgba(var(--teal-rgb),0.18)" stroke-width="3" stroke-linecap="round" />
+    </svg>
+
+    <svg class="wave-low" viewBox="0 0 1200 360" preserveAspectRatio="none">
+      <path d="M0,170 C120,300 240,40 360,160 C480,280 600,60 720,180 C840,300 960,40 1080,160 C1140,220 1170,255 1200,280 L1200,360 L0,360 Z"
+            fill="rgba(var(--teal-rgb),0.10)" />
+      <path d="M0,210 C150,340 300,90 450,200 C600,320 750,110 900,220 C1050,340 1120,250 1200,280 L1200,360 L0,360 Z"
+            fill="rgba(var(--orange-rgb),0.08)" />
+    </svg>
+  </div>
+</header>
+
+<div id="floatToast" class="float-toast pending" role="status" aria-live="polite" aria-atomic="true">
+  <div class="icon" id="ftIcon" aria-hidden="true">…</div>
+  <div style="min-width:0;">
+    <div class="t-title" id="ftTitle">Ready</div>
+    <div class="t-sub" id="ftMsg">Admin online</div>
+  </div>
+</div>
+
+<main>
+  <div class="topbar">
+    <div class="topbar-left">
+      <a class="backlink-top" href="ipu.html?ipu_id=1&name=Dayton" aria-label="Back to IPU">
+        <span aria-hidden="true">←</span> <span>Back to IPU</span>
+      </a>
+      <div>
+        <div class="orgline">OHI • Innovative Care Solutions</div>
+        <div class="addrline">Admin tools for IPU inventory control</div>
+      </div>
+    </div>
+
+    <a class="pill-lite" href="index.html" title="Choose IPU">
+      Choose IPU <span aria-hidden="true">›</span>
+    </a>
+  </div>
+
+  <div class="grid">
+    <div class="left">
+      <section class="ui-card" id="scanCard">
+        <div class="ui-card-title">
+          <span>Scan In</span>
+          <span class="ui-subtle">Serialized assets</span>
+        </div>
+
+        <div class="scan-row">
+          <div class="ui-input-wrap">
+            <svg class="ui-search" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+              <path d="M10.5 18a7.5 7.5 0 1 1 0-15 7.5 7.5 0 0 1 0 15Z"
+                    stroke="rgba(15,23,42,.55)" stroke-width="1.8"/>
+              <path d="M16.2 16.2 21 21"
+                    stroke="rgba(15,23,42,.55)" stroke-width="1.8" stroke-linecap="round"/>
+            </svg>
+            <input id="assetInput" class="ui-input" placeholder="Scan barcode…" autocomplete="off" />
+          </div>
+
+          <button class="enter-btn" id="enterBtn" type="button">Send</button>
+        </div>
+
+        <div class="ui-subtle" style="margin-top:8px;">
+          Enter = Scan-in (admin) · Shift+Enter = Scan-out (admin)
+        </div>
+      </section>
+
+      <section class="ui-card table-card">
+        <div class="table-head">
+          <div class="ui-card-title" style="margin:0;">
+            <span>Quick Adjustments</span>
+            <span class="ui-subtle">Tracked items</span>
+          </div>
+          <span class="ui-subtle">On / Par</span>
+        </div>
+
+        <div class="table-wrap">
+          <table class="table" aria-label="Quick Adjustments Table">
+            <thead>
+              <tr>
+                <th>Item</th>
+                <th class="qty">On</th>
+                <th class="qty">Par</th>
+                <th class="actions">Actions</th>
+              </tr>
+            </thead>
+            <tbody id="rows"></tbody>
+          </table>
+        </div>
+      </section>
+    </div>
+
+    <div class="right">
+      <section class="ui-card">
+        <div class="ui-card-title">
+          <span>Management</span>
+          <span class="ui-subtle">Tools</span>
+        </div>
+
+        <div class="admin-list">
+          <div class="tool-card" role="button" tabindex="0" id="invTool">
+            <div class="tool-left">
+              <div class="tool-icon" aria-hidden="true">
+                <img src="zz.inventory icon.png" alt="" class="tool-icon-img">
+              </div>
+              <div class="tool-text">
+                <div class="tool-title">Inventory Management</div>
+                <div class="tool-sub">Add/edit serialized assets · item mapping</div>
+              </div>
+            </div>
+            <div class="chev" aria-hidden="true">›</div>
+          </div>
+
+          <div class="tool-card" role="button" tabindex="0" id="parTool">
+            <div class="tool-left">
+              <div class="tool-icon" aria-hidden="true">
+                <img src="zz.Par icon.png" alt="" class="tool-icon-img">
+              </div>
+              <div class="tool-text">
+                <div class="tool-title">Par Level Management</div>
+                <div class="tool-sub">Set targets per IPU · track shortages</div>
+              </div>
+            </div>
+            <div class="chev" aria-hidden="true">›</div>
+          </div>
+
+          <div class="tool-card" role="button" tabindex="0" id="histTool">
+            <div class="tool-left">
+              <div class="tool-icon" aria-hidden="true">
+                <img src="zz.History icon.png" alt="" class="tool-icon-img">
+              </div>
+              <div class="tool-text">
+                <div class="tool-title">History</div>
+                <div class="tool-sub">Movement log · filters · audit trail</div>
+              </div>
+            </div>
+            <div class="chev" aria-hidden="true">›</div>
+          </div>
+        </div>
+      </section>
+
+      <section class="ui-card queue-card">
+        <div class="ui-card-title" style="margin-bottom:0;">
+          <span>Changes Queue</span>
+          <span class="ui-subtle" id="queueSummary">0 pending</span>
+        </div>
+
+        <div class="queue-wrap" id="queueWrap" aria-label="Changes Queue"></div>
+
+        <div class="queue-footer">
+          <div class="queue-meta" id="queueMeta">Unrecognized: 0 · Ready changes: 0</div>
+          <button id="confirmBtn" class="confirm-btn" type="button" aria-disabled="true">Confirm / Update</button>
+        </div>
+      </section>
+    </div>
+  </div>
+</main>
+
+<!-- Par Level Modal -->
+<div id="parModal" class="modal-overlay" aria-hidden="true">
+  <div class="modal-card" role="dialog" aria-modal="true" aria-labelledby="parModalTitle">
+    <div class="modal-head">
+      <div>
+        <div id="parModalTitle" class="modal-title">Par Level Management</div>
+        <div class="modal-sub">Edit par counts for tracked items</div>
+      </div>
+      <button id="parModalClose" class="modal-close" type="button" aria-label="Close">×</button>
+    </div>
+
+    <div id="parList" class="par-list"></div>
+
+    <div class="modal-actions">
+      <button id="parCancelBtn" class="modal-btn" type="button">Cancel</button>
+      <button id="parSaveBtn" class="modal-btn primary" type="button">Save Par Levels</button>
+    </div>
+  </div>
+</div>
+
+<!-- History Modal -->
+<div id="historyModal" class="modal-overlay" aria-hidden="true">
+  <div class="modal-card history-card" role="dialog" aria-modal="true" aria-labelledby="historyModalTitle">
+    <div class="modal-head">
+      <div>
+        <div id="historyModalTitle" class="modal-title">History</div>
+        <div class="modal-sub">Recent movement history for this IPU · search refines the loaded results</div>
+      </div>
+      <button id="historyModalClose" class="modal-close" type="button" aria-label="Close">×</button>
+    </div>
+
+    <div class="history-controls">
+      <div class="ui-input-wrap">
+        <svg class="ui-search" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+          <path d="M10.5 18a7.5 7.5 0 1 1 0-15 7.5 7.5 0 0 1 0 15Z"
+                stroke="rgba(15,23,42,.55)" stroke-width="1.8"/>
+          <path d="M16.2 16.2 21 21"
+                stroke="rgba(15,23,42,.55)" stroke-width="1.8" stroke-linecap="round"/>
+        </svg>
+        <input id="historySearchInput" class="ui-input" placeholder="Search asset number or asset id…" autocomplete="off" />
+      </div>
+      <button id="historySearchBtn" class="history-btn" type="button">Search</button>
+      <button id="historyResetBtn" class="history-btn" type="button">Reset</button>
+    </div>
+
+    <div class="history-wrap">
+      <table class="history-table" aria-label="Movement History Table">
+        <thead>
+          <tr>
+            <th>Time</th>
+            <th>Asset</th>
+            <th>Item</th>
+            <th>Type</th>
+            <th>Status</th>
+            <th>Role</th>
+            <th>Asset ID</th>
+          </tr>
+        </thead>
+        <tbody id="historyRows"></tbody>
+      </table>
+      <div id="historyEmpty" class="history-empty" style="display:none;">No history found.</div>
+    </div>
+  </div>
+</div>
+
+<script>
+const REST_BASE = "https://sosyqdgeqgfuclffmzgl.supabase.co";
+const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNvc3lxZGdlcWdmdWNsZmZtemdsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Njk3ODA0MjgsImV4cCI6MjA4NTM1NjQyOH0.quknRUYbRqvLMpsCKjlytN38hek5sk1v1o6KJEwTCxQ";
+const IPU_ID = Number(new URLSearchParams(location.search).get("ipu_id") || 1);
+
+const EDGE_URL = "https://sosyqdgeqgfuclffmzgl.supabase.co/functions/v1/asset-movement";
+const CONTRACT = { scanTypes: { OUT:"scan_out", IN:"scan_in", VERIFY:"verify" } };
+const TOTALS_TABLE = "ipu_item_totals";
+const HISTORY_TABLE = "scan_history";
+
+const rowsEl = document.getElementById("rows");
+const queueWrap = document.getElementById("queueWrap");
+const queueSummary = document.getElementById("queueSummary");
+const queueMeta = document.getElementById("queueMeta");
+const confirmBtn = document.getElementById("confirmBtn");
+const assetInput = document.getElementById("assetInput");
+const enterBtn = document.getElementById("enterBtn");
+
+const ft = document.getElementById("floatToast");
+const ftIcon = document.getElementById("ftIcon");
+const ftTitle = document.getElementById("ftTitle");
+const ftMsg = document.getElementById("ftMsg");
+
+const parModal = document.getElementById("parModal");
+const parList = document.getElementById("parList");
+const parModalClose = document.getElementById("parModalClose");
+const parCancelBtn = document.getElementById("parCancelBtn");
+const parSaveBtn = document.getElementById("parSaveBtn");
+const parTool = document.getElementById("parTool");
+
+const historyModal = document.getElementById("historyModal");
+const historyModalClose = document.getElementById("historyModalClose");
+const historySearchInput = document.getElementById("historySearchInput");
+const historySearchBtn = document.getElementById("historySearchBtn");
+const historyResetBtn = document.getElementById("historyResetBtn");
+const historyRows = document.getElementById("historyRows");
+const historyEmpty = document.getElementById("historyEmpty");
+const histTool = document.getElementById("histTool");
+
+function sbHeaders(extra = {}) {
+  return {
+    "apikey": SUPABASE_ANON_KEY,
+    "Authorization": `Bearer ${SUPABASE_ANON_KEY}`,
+    "Content-Type": "application/json",
+    "Accept": "application/json",
+    ...extra,
+  };
+}
+
+function escapeHtml(s){
+  return String(s)
+    .replaceAll("&","&amp;")
+    .replaceAll("<","&lt;")
+    .replaceAll(">","&gt;")
+    .replaceAll('"',"&quot;")
+    .replaceAll("'","&#039;");
+}
+
+function uid(){
+  return Math.random().toString(16).slice(2) + Date.now().toString(16);
+}
+
+function fit20Rows(){
+  const wrap = document.querySelector(".table-wrap");
+  const table = wrap?.querySelector("table");
+  if(!wrap || !table) return;
+
+  const thead = table.querySelector("thead");
+  const headH = thead ? thead.getBoundingClientRect().height : 0;
+  const wrapH = wrap.getBoundingClientRect().height;
+  const available = Math.max(0, wrapH - headH);
+
+  const rows = 20;
+  const rawRowH = Math.floor(available / rows);
+
+  const rowH = Math.max(16, Math.min(rawRowH, 28));
+  const btnH = Math.max(16, Math.min(rowH - 2, 24));
+
+  document.documentElement.style.setProperty("--rowH", `${rowH}px`);
+  document.documentElement.style.setProperty("--btnH", `${btnH}px`);
+}
+
+let toastTimer = null;
+
+function notify({ type="success", title="Saved", message="", icon=null, ms=3200 }){
+  ft.classList.remove("pending","success","warn","error");
+  ft.classList.add(type);
+
+  const iconMap = { pending:"…", success:"✓", warn:"!", error:"✕" };
+  ftIcon.textContent = icon ?? iconMap[type] ?? "✓";
+  ftTitle.textContent = title;
+  ftMsg.textContent = message;
+
+  ft.classList.add("show");
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => ft.classList.remove("show"), ms);
+}
+
+function formatDateTime(value){
+  if(!value) return "";
+  const d = new Date(value);
+  if(Number.isNaN(d.getTime())) return String(value);
+  return d.toLocaleString();
+}
+
+function statusClass(v){
+  const s = String(v || "").toLowerCase();
+  if (["success", "ok"].includes(s)) return "ok";
+  if (["already_on_hand", "warning", "warn"].includes(s)) return "warn";
+  if (["unknown_asset", "error", "failed", "bad"].includes(s)) return "bad";
+  return "";
+}
+
+let TRACKED_ITEMS = [];
+let QUEUE = [];
+let HISTORY_CACHE = [];
+
+function setConfirmEnabled(enabled){
+  if(enabled){
+    confirmBtn.classList.add("enabled");
+    confirmBtn.setAttribute("aria-disabled","false");
+    confirmBtn.disabled = false;
+  } else {
+    confirmBtn.classList.remove("enabled");
+    confirmBtn.setAttribute("aria-disabled","true");
+    confirmBtn.disabled = true;
+  }
+}
+
+function updateConfirmGate(){
+  const ready = QUEUE.filter(e => e.kind === "adjust").length;
+  const unrec = QUEUE.filter(e => e.kind === "scan" && e.status === "bad").length;
+
+  setConfirmEnabled(ready > 0);
+  queueSummary.textContent = `${QUEUE.length} pending`;
+  queueMeta.textContent = `Unrecognized: ${unrec} · Ready changes: ${ready}`;
+}
+
+function addOrMergeAdjustment(item_id, name, delta){
+  const existing = QUEUE.find(e => e.kind === "adjust" && e.item_id === item_id);
+  if(existing){
+    existing.delta += delta;
+    if(existing.delta === 0){
+      QUEUE = QUEUE.filter(e => e.id !== existing.id);
+    }
+  } else {
+    QUEUE.unshift({ id: uid(), kind:"adjust", status:"neutral", item_id, name, delta });
+  }
+  renderQueue();
+}
+
+function pushScanQueue({ status, asset_number, item_name, note }){
+  const icon = status === "ok" ? "✓" : (status === "warn" ? "!" : "✕");
+  const title =
+    status === "ok" ? `Scan-in: ${asset_number}` :
+    status === "warn" ? `Scan: ${asset_number}` :
+    `Unknown: ${asset_number}`;
+
+  QUEUE.unshift({
+    id: uid(),
+    kind: "scan",
+    status,
+    asset_number,
+    item_name: item_name || "",
+    note: note || "",
+    icon,
+    title
+  });
+  renderQueue();
+}
+
+function deleteQueueEntry(id){
+  QUEUE = QUEUE.filter(e => e.id !== id);
+  renderQueue();
+}
+
+function renderQueue(){
+  queueWrap.innerHTML = "";
+
+  if(QUEUE.length === 0){
+    queueWrap.innerHTML = `
+      <div class="queue-empty">
+        No pending changes yet.<br/>
+        Use +/− to queue updates or scan assets.
+      </div>
+    `;
+    updateConfirmGate();
+    return;
+  }
+
+  const frag = document.createDocumentFragment();
+
+  QUEUE.forEach(e => {
+    const div = document.createElement("div");
+    div.className = `q-item ${e.status || ""}`;
+
+    if(e.kind === "adjust"){
+      const sign = e.delta > 0 ? "+" : "";
+      div.innerHTML = `
+        <div class="q-left">
+          <div class="q-icon neutral" title="Adjustment">±</div>
+          <div class="q-text">
+            <div class="q-title">Adjustment: ${escapeHtml(e.name)}</div>
+            <div class="q-sub">Delta: <b>${sign}${e.delta}</b> (queued)</div>
+          </div>
+        </div>
+        <div class="q-actions">
+          <button class="q-btn" data-act="del" data-id="${e.id}">Remove</button>
+        </div>
+      `;
+    } else {
+      const iconClass = e.status === "ok" ? "ok" : (e.status === "warn" ? "warn" : "bad");
+      const line2 =
+        e.status === "ok"
+          ? `${escapeHtml(e.item_name || "Recognized")} · ${escapeHtml(e.note || "Moved")}`
+          : (e.status === "warn"
+              ? `${escapeHtml(e.note || "Already on hand")}`
+              : `${escapeHtml(e.note || "Not found")}`);
+
+      div.innerHTML = `
+        <div class="q-left">
+          <div class="q-icon ${iconClass}" title="Scan">${escapeHtml(e.icon || "✓")}</div>
+          <div class="q-text">
+            <div class="q-title">${escapeHtml(e.title || "Scan")}</div>
+            <div class="q-sub">${line2}</div>
+          </div>
+        </div>
+        <div class="q-actions">
+          <button class="q-btn" data-act="del" data-id="${e.id}">Remove</button>
+        </div>
+      `;
+    }
+
+    frag.appendChild(div);
+  });
+
+  queueWrap.appendChild(frag);
+
+  queueWrap.querySelectorAll("button[data-act='del']").forEach(btn => {
+    btn.addEventListener("click", () => deleteQueueEntry(btn.dataset.id));
+  });
+
+  updateConfirmGate();
+}
+
+async function loadItems() {
+  const url =
+    `${REST_BASE}/rest/v1/${TOTALS_TABLE}` +
+    `?select=item_id,total_quantity,par_quantity,items(name)` +
+    `&ipu_id=eq.${IPU_ID}` +
+    `&order=item_id.asc`;
+
+  const res = await fetch(url, {
+    headers: {
+      apikey: SUPABASE_ANON_KEY,
+      Authorization: `Bearer ${SUPABASE_ANON_KEY}`,
+      Accept: "application/json",
+    },
+  });
+
+  if (!res.ok) {
+    const text = await res.text();
+    notify({ type:"error", title:"Load failed", message: text || "Could not load totals" });
+    return;
+  }
+
+  const data = await res.json();
+
+  TRACKED_ITEMS = data.map(r => ({
+    item_id: r.item_id,
+    name: r.items?.name ?? `Item ${r.item_id}`,
+    on: Number(r.total_quantity ?? 0),
+    par: Number(r.par_quantity ?? 0),
+  })).sort((a, b) => a.name.localeCompare(b.name));
+
+  renderTable();
+}
+
+function renderTable(){
+  rowsEl.innerHTML = "";
+
+  TRACKED_ITEMS.forEach((r, idx) => {
+    const good = Number(r.on) >= Number(r.par);
+    const onClass = good ? "par-good" : "par-bad";
+
+    const tr = document.createElement("tr");
+    tr.innerHTML = `
+      <td title="${escapeHtml(r.name)}">${escapeHtml(r.name)}</td>
+      <td class="qty on ${onClass}">${r.on}</td>
+      <td class="qty">${r.par}</td>
+      <td class="actions">
+        <button class="action-btn" data-idx="${idx}" data-delta="-1" title="Remove 1">−</button>
+        <button class="action-btn" data-idx="${idx}" data-delta="1" title="Add 1">+</button>
+      </td>
+    `;
+    rowsEl.appendChild(tr);
+  });
+
+  rowsEl.querySelectorAll(".action-btn").forEach(btn => {
+    btn.addEventListener("click", () => {
+      const i = Number(btn.dataset.idx);
+      const d = Number(btn.dataset.delta);
+
+      const item = TRACKED_ITEMS[i];
+      item.on = Math.max(0, item.on + d);
+
+      renderTable();
+      addOrMergeAdjustment(item.item_id, item.name, d);
+      fit20Rows();
+    });
+  });
+
+  fit20Rows();
+}
+
+async function upsertTotals(rows){
+  const res = await fetch(
+    `${REST_BASE}/rest/v1/${TOTALS_TABLE}?on_conflict=ipu_id,item_id`,
+    {
+      method: "POST",
+      headers: sbHeaders({
+        "Prefer": "resolution=merge-duplicates,return=representation"
+      }),
+      body: JSON.stringify(rows)
+    }
+  );
+
+  if(!res.ok){
+    const t = await res.text();
+    throw new Error(t);
+  }
+
+  return await res.json();
+}
+
+confirmBtn.addEventListener("click", async () => {
+  try{
+    const adjustEntries = QUEUE.filter(e => e.kind === "adjust");
+    if(adjustEntries.length === 0){
+      notify({ type:"warn", title:"Nothing to save", message:"No quantity changes queued." });
+      return;
+    }
+
+    notify({ type:"pending", title:"Saving", message:"Updating totals…" });
+
+    const touchedIds = [...new Set(adjustEntries.map(e => e.item_id))];
+
+    const payload = touchedIds.map(item_id => {
+      const item = TRACKED_ITEMS.find(x => x.item_id === item_id);
+      return {
+        ipu_id: IPU_ID,
+        item_id,
+        total_quantity: Number(item?.on || 0),
+        par_quantity: Number(item?.par || 0),
+      };
+    });
+
+    await upsertTotals(payload);
+
+    QUEUE = QUEUE.filter(e => e.kind !== "adjust");
+    renderQueue();
+
+    notify({ type:"success", title:"Saved", message:"Totals updated." });
+    await loadItems();
+  } catch (err){
+    console.error(err);
+    notify({ type:"error", title:"Save failed", message: (err?.message || String(err)).slice(0, 220) });
+  }
+});
+
+async function sendScan(asset_number, ipu_id, scan_type) {
+  const res = await fetch(EDGE_URL, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      "Authorization": "Bearer " + SUPABASE_ANON_KEY,
+      "apikey": SUPABASE_ANON_KEY
+    },
+    body: JSON.stringify({ asset_number, ipu_id, scan_type })
+  });
+
+  let data = null;
+  try { data = await res.json(); }
+  catch { data = { status: "bad_json", message: "Edge returned non-JSON" }; }
+
+  if (!res.ok) {
+    return {
+      status: data?.status || "http_error",
+      message: data?.message || data?.error || `HTTP ${res.status}`,
+      raw: data
+    };
+  }
+
+  return data;
+}
+
+async function runScan(scan_type){
+  const asset = assetInput.value.trim();
+  if(!asset) return;
+
+  notify({
+    type:"pending",
+    title:"Sending",
+    message:`${asset} · ${scan_type === CONTRACT.scanTypes.IN ? "Scan-in" : "Scan-out"}`
+  });
+
+  enterBtn.disabled = true;
+  assetInput.disabled = true;
+
+  let result;
+  try{
+    result = await sendScan(asset, IPU_ID, scan_type);
+  } catch (err){
+    console.error(err);
+    notify({ type:"error", title:"Network error", message: String(err).slice(0, 220) });
+    enterBtn.disabled = false;
+    assetInput.disabled = false;
+    assetInput.focus();
+    return;
+  }
+
+  if (result?.status === "success") {
+    const msg = result?.notice === "already_on_hand"
+      ? `${asset} · Already on hand (count +1)`
+      : asset;
+
+    notify({ type: "success", title: "Scan recorded", message: msg });
+
+    pushScanQueue({
+      status: "ok",
+      asset_number: asset,
+      item_name: result.item_name || "",
+      note: result?.notice === "already_on_hand"
+        ? "Already on hand (count +1)"
+        : (scan_type === CONTRACT.scanTypes.IN ? "Scan-in" : "Scan-out")
+    });
+
+    await loadItems();
+
+  } else if (result?.status === "already_on_hand") {
+
+    notify({ type: "success", title: "Scan recorded", message: `${asset} · Already on hand (count +1)` });
+
+    pushScanQueue({
+      status: "ok",
+      asset_number: asset,
+      item_name: result.item_name || "",
+      note: "Already on hand (count +1)"
+    });
+
+    await loadItems();
+
+  } else if (result?.status === "unknown_asset") {
+
+    notify({ type: "error", title: "Unknown asset", message: asset });
+
+    pushScanQueue({
+      status: "bad",
+      asset_number: asset,
+      item_name: result.item_name || "",
+      note: "Not found"
+    });
+
+  } else {
+
+    notify({
+      type: "error",
+      title: "Scan failed",
+      message: `${result?.status || "error"}${result?.message ? " · " + result.message : ""}`.slice(0, 220)
+    });
+
+    pushScanQueue({
+      status: "bad",
+      asset_number: asset,
+      item_name: result.item_name || "",
+      note: (result?.status || "error")
+    });
+  }
+
+  assetInput.value = "";
+  enterBtn.disabled = false;
+  assetInput.disabled = false;
+  assetInput.focus();
+}
+
+/* Par modal */
+function openParModal(){
+  renderParModalList();
+  parModal.classList.add("show");
+  parModal.setAttribute("aria-hidden", "false");
+}
+
+function closeParModal(){
+  parModal.classList.remove("show");
+  parModal.setAttribute("aria-hidden", "true");
+}
+
+function renderParModalList(){
+  parList.innerHTML = "";
+
+  TRACKED_ITEMS.forEach((item, idx) => {
+    const row = document.createElement("div");
+    row.className = "par-row";
+    row.innerHTML = `
+      <div class="par-name" title="${escapeHtml(item.name)}">${escapeHtml(item.name)}</div>
+      <input
+        class="par-input"
+        type="number"
+        min="0"
+        step="1"
+        value="${Number(item.par || 0)}"
+        data-idx="${idx}"
+      />
+    `;
+    parList.appendChild(row);
+  });
+}
+
+async function saveParLevels(){
+  try{
+    const inputs = [...parList.querySelectorAll(".par-input")];
+
+    inputs.forEach(input => {
+      const idx = Number(input.dataset.idx);
+      const val = Math.max(0, Number(input.value || 0));
+      TRACKED_ITEMS[idx].par = val;
+    });
+
+    const payload = TRACKED_ITEMS.map(item => ({
+      ipu_id: IPU_ID,
+      item_id: item.item_id,
+      total_quantity: Number(item.on || 0),
+      par_quantity: Number(item.par || 0),
+    }));
+
+    notify({ type:"pending", title:"Saving", message:"Updating par levels…" });
+    await upsertTotals(payload);
+
+    renderTable();
+    closeParModal();
+    notify({ type:"success", title:"Saved", message:"Par levels updated." });
+    await loadItems();
+  } catch (err){
+    console.error(err);
+    notify({ type:"error", title:"Save failed", message:(err?.message || String(err)).slice(0,220) });
+  }
+}
+
+/* History modal */
+function renderHistoryRows(rows){
+  historyRows.innerHTML = "";
+
+  if(!rows || rows.length === 0){
+    historyEmpty.style.display = "block";
+    return;
+  }
+
+  historyEmpty.style.display = "none";
+
+  rows.forEach(row => {
+    const time = row.created_at ? formatDateTime(row.created_at) : "";
+    const assetNumber = row.assets?.asset_number ?? "—";
+    const itemName = row.assets?.items?.name ?? "—";
+    const typeVal = row.scan_type || "";
+    const statusVal = row.result || "";
+    const roleVal = row.scanner_role || "—";
+    const assetIdVal = row.asset_id ?? "—";
+
+    const tr = document.createElement("tr");
+    tr.innerHTML = `
+      <td>${escapeHtml(time)}</td>
+      <td>${escapeHtml(String(assetNumber))}</td>
+      <td>${escapeHtml(itemName)}</td>
+      <td>${escapeHtml(typeVal)}</td>
+      <td><span class="status-chip ${statusClass(statusVal)}">${escapeHtml(statusVal || "—")}</span></td>
+      <td>${escapeHtml(roleVal)}</td>
+      <td>${escapeHtml(String(assetIdVal))}</td>
+    `;
+    historyRows.appendChild(tr);
+  });
+}
+
+function refineHistoryFromCache(searchTerm = ""){
+  let rows = HISTORY_CACHE;
+
+  if(searchTerm){
+    const q = searchTerm.trim().toLowerCase();
+    rows = HISTORY_CACHE.filter(r => {
+      const assetNumber = String(r.assets?.asset_number ?? "").toLowerCase();
+      const assetId = String(r.asset_id ?? "").toLowerCase();
+      return assetNumber.includes(q) || assetId.includes(q);
+    });
+  }
+
+  renderHistoryRows(rows);
+
+  if(searchTerm){
+    notify({
+      type:"success",
+      title:"History filtered",
+      message:`Showing results for ${searchTerm}`,
+      ms: 1400
+    });
+  }
+}
+
+async function loadHistory(){
+  try{
+    historyRows.innerHTML = "";
+    historyEmpty.style.display = "block";
+    historyEmpty.textContent = "Loading history…";
+
+    notify({ type:"pending", title:"Loading", message:"Fetching history…" });
+
+    const url =
+      `${REST_BASE}/rest/v1/${HISTORY_TABLE}` +
+      `?select=id,created_at,ipu_id,asset_id,item_id,scanner_role,scan_type,result,assets(asset_number,item_id,items(name)),items(name)` +
+      `&ipu_id=eq.${IPU_ID}` +
+      `&order=created_at.desc` +
+      `&limit=250`;
+
+    const res = await fetch(url, { headers: sbHeaders() });
+
+    if(!res.ok){
+      const text = await res.text();
+      throw new Error(text || "Could not load history");
+    }
+
+    const data = await res.json();
+    HISTORY_CACHE = Array.isArray(data) ? data : [];
+
+    renderHistoryRows(HISTORY_CACHE);
+
+    notify({
+      type:"success",
+      title:"History loaded",
+      message:`Showing recent IPU ${IPU_ID} history`,
+      ms: 1600
+    });
+  } catch (err){
+    console.error(err);
+    HISTORY_CACHE = [];
+    historyRows.innerHTML = "";
+    historyEmpty.style.display = "block";
+    historyEmpty.textContent = "Could not load history.";
+    notify({ type:"error", title:"History failed", message:(err?.message || String(err)).slice(0,220) });
+  }
+}
+
+function openHistoryModal(){
+  historySearchInput.value = "";
+  historyModal.classList.add("show");
+  historyModal.setAttribute("aria-hidden", "false");
+  loadHistory();
+  setTimeout(() => historySearchInput.focus(), 50);
+}
+
+function closeHistoryModal(){
+  historyModal.classList.remove("show");
+  historyModal.setAttribute("aria-hidden", "true");
+}
+
+enterBtn.addEventListener("click", async () => {
+  await runScan(CONTRACT.scanTypes.IN);
+});
+
+assetInput.addEventListener("keydown", async (e) => {
+  if(e.key !== "Enter") return;
+  e.preventDefault();
+  const scan_type = e.shiftKey ? CONTRACT.scanTypes.OUT : CONTRACT.scanTypes.IN;
+  await runScan(scan_type);
+});
+
+document.getElementById("invTool").addEventListener("click", () => notify({ type:"warn", title:"Not wired", message:"Inventory Management (wire later)" }));
+
+parTool.addEventListener("click", openParModal);
+parTool.addEventListener("keydown", (e) => {
+  if(e.key === "Enter" || e.key === " "){
+    e.preventDefault();
+    openParModal();
+  }
+});
+
+parModalClose.addEventListener("click", closeParModal);
+parCancelBtn.addEventListener("click", closeParModal);
+parSaveBtn.addEventListener("click", saveParLevels);
+parModal.addEventListener("click", (e) => {
+  if(e.target === parModal) closeParModal();
+});
+
+histTool.addEventListener("click", openHistoryModal);
+histTool.addEventListener("keydown", (e) => {
+  if(e.key === "Enter" || e.key === " "){
+    e.preventDefault();
+    openHistoryModal();
+  }
+});
+
+historyModalClose.addEventListener("click", closeHistoryModal);
+historyModal.addEventListener("click", (e) => {
+  if(e.target === historyModal) closeHistoryModal();
+});
+
+historySearchBtn.addEventListener("click", () => {
+  refineHistoryFromCache(historySearchInput.value);
+});
+
+historyResetBtn.addEventListener("click", () => {
+  historySearchInput.value = "";
+  renderHistoryRows(HISTORY_CACHE);
+  notify({ type:"success", title:"History reset", message:`Showing full IPU ${IPU_ID} history`, ms: 1400 });
+});
+
+historySearchInput.addEventListener("keydown", (e) => {
+  if(e.key === "Enter"){
+    e.preventDefault();
+    refineHistoryFromCache(historySearchInput.value);
+  }
+});
+
+document.addEventListener("keydown", (e) => {
+  if(e.key === "Escape"){
+    if(parModal.classList.contains("show")) closeParModal();
+    if(historyModal.classList.contains("show")) closeHistoryModal();
+  }
+});
+
+renderQueue();
+loadItems();
+window.addEventListener("resize", () => fit20Rows());
+setTimeout(() => { assetInput.focus(); fit20Rows(); }, 150);
+setTimeout(() => notify({ type:"success", title:"Ready", message:`Admin online · IPU ${IPU_ID}` , ms: 1800 }), 220);
+</script>
+
+</body>
+</html>
