@@ -1343,7 +1343,7 @@ document.getElementById("historyBtn").addEventListener("click", () => {
 async function init(){
   try {
     await loadTotals();
-    showToast({ state:"success", icon:"✓", meta:"Ready", detail:`${ipuName} IPU online` });
+    showToast({ state:"success", icon:"✓", meta:"Ready", detail:`${ipuName} online` });
   } catch (err) {
     console.error(err);
     showToast({ state:"error", icon:"✕", meta:"Load failed", detail:String(err).slice(0, 180) });
