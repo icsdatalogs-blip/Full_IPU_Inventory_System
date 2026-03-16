@@ -1,0 +1,992 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Inventory Management</title>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+
+<style>
+:root{
+  --bgTop:#ffffff; --bgBot:#f4f6f9;
+
+  --ink: rgba(15,23,42,.82);
+  --ink2: rgba(15,23,42,.72);
+  --muted: rgba(15,23,42,.55);
+  --muted2: rgba(15,23,42,.45);
+
+  --teal-rgb: 20,137,168;
+  --orange-rgb: 243,112,33;
+
+  --surface: rgba(255,255,255,.94);
+  --surfaceSolid:#ffffff;
+
+  --line: rgba(15, 23, 42, .10);
+  --line2: rgba(15, 23, 42, .16);
+  --shadow: 0 1px 2px rgba(16,24,40,.05), 0 10px 25px rgba(16,24,40,.06);
+
+  --radius: 18px;
+  --ease: cubic-bezier(.2,.8,.2,1);
+  --focus: rgba(var(--teal-rgb), .18);
+
+  --okBorder: rgba(34,197,94,.45);
+  --warnBorder: rgba(245,158,11,.45);
+  --badBorder: rgba(239,68,68,.45);
+}
+
+*{ box-sizing:border-box; font-family: Inter, system-ui, -apple-system, BlinkMacSystemFont, sans-serif; }
+html, body { min-height:100%; }
+
+body{
+  margin:0;
+  color: var(--ink);
+  background: linear-gradient(to bottom, var(--bgTop) 0%, var(--bgTop) 200px, var(--bgBot) 200px, var(--bgBot) 100%);
+}
+
+header{
+  text-align:center;
+  padding: 26px 18px 10px;
+  position:relative;
+  overflow:hidden;
+}
+.header-sheen{
+  position:absolute; left:50%; top:12px; transform:translateX(-50%);
+  width:min(980px, 96vw); height:100px;
+  background: radial-gradient(360px 90px at 50% 45%,
+      rgba(255,255,255,0.92),
+      rgba(255,255,255,0.55) 55%,
+      rgba(255,255,255,0.0) 78%);
+  pointer-events:none; z-index:1;
+}
+.header-title,.header-sub,.header-tagline{ position:relative; z-index:2; }
+.header-title{ font-size:18px; font-weight:900; letter-spacing:.7px; color: var(--ink2); }
+.header-sub{ font-size:11px; margin-top:4px; letter-spacing:1px; color:rgba(0,0,0,.50); text-transform:uppercase; font-weight:800; }
+.header-tagline{ margin-top:6px; font-size:12px; color:rgba(0,0,0,.50); letter-spacing:.2px; font-weight:600; }
+
+.wave-layer{ position:absolute; bottom:34px; left:0; width:100%; height:120px; pointer-events:none; z-index:0; }
+.wave-layer svg{ position:absolute; inset:0; width:120%; left:-10%; height:100%; display:block; opacity:.40; filter:saturate(1.02); }
+.wave-top{ transform: translateY(-8px); }
+.wave-mid{ transform: translateY(1px); }
+.wave-low{ transform: translateY(10px); }
+
+main{
+  max-width: 1320px;
+  margin: 0 auto;
+  padding: 0 10px 18px;
+}
+
+.topbar{
+  display:flex;
+  align-items:flex-start;
+  justify-content:space-between;
+  gap:10px;
+  padding: 4px 4px 10px;
+}
+.topbar-left{ display:flex; flex-direction:column; gap:4px; text-align:left; }
+
+.backlink-top{
+  display:inline-flex; align-items:center; gap:10px;
+  text-decoration:none; color: rgba(15,23,42,.58);
+  font-weight:900; width: fit-content;
+  transition: color .16s var(--ease), transform .16s var(--ease);
+}
+.backlink-top:hover{ color: rgba(15,23,42,.70); transform: translateY(-1px); }
+.backlink-top:focus-visible{ outline:none; box-shadow:0 0 0 4px var(--focus); border-radius:12px; padding:6px 8px; }
+
+.orgline{ font-size:12px; font-weight:900; color: var(--muted); }
+.addrline{ font-size:11px; color: var(--muted2); font-weight:700; }
+
+.pill-lite{
+  display:inline-flex; align-items:center; justify-content:center;
+  height:34px; padding:0 10px;
+  border-radius:12px;
+  border:1px solid var(--line);
+  background: rgba(255,255,255,.92);
+  box-shadow:0 1px 2px rgba(16,24,40,.06);
+  color: rgba(15,23,42,.62);
+  font-weight:900;
+  text-decoration:none;
+  gap:10px;
+  transition: border-color .18s var(--ease), transform .18s var(--ease), background .18s var(--ease), box-shadow .18s var(--ease);
+}
+.pill-lite:hover{ border-color: var(--line2); background: rgba(255,255,255,.98); transform: translateY(-1px); }
+
+.grid{
+  display:grid;
+  grid-template-columns: 380px 1fr;
+  gap: 12px;
+  align-items:start;
+  padding: 0 4px;
+}
+
+.ui-card{
+  background: var(--surface);
+  border:1px solid var(--line);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  padding: 12px;
+  position:relative;
+}
+.ui-card::before{
+  content:"";
+  position:absolute;
+  inset:8px;
+  border-radius: calc(var(--radius) - 8px);
+  pointer-events:none;
+  background:
+    radial-gradient(70px 70px at 18% 20%, rgba(var(--orange-rgb),.10), transparent 65%),
+    radial-gradient(90px 90px at 78% 62%, rgba(var(--teal-rgb),.09), transparent 70%);
+  opacity:.85;
+}
+.ui-card > *{ position:relative; z-index:1; }
+
+.ui-card-title{
+  display:flex; align-items:center; justify-content:space-between;
+  gap:10px;
+  font-size:13px;
+  font-weight:900;
+  color: rgba(15,23,42,.74);
+  margin-bottom: 10px;
+}
+.ui-subtle{ font-size:11px; color: rgba(15,23,42,.52); font-weight:800; }
+
+.stack{ display:flex; flex-direction:column; gap:10px; }
+
+.field-group{
+  display:flex;
+  flex-direction:column;
+  gap:6px;
+}
+.field-label{
+  font-size:11px;
+  font-weight:900;
+  color: rgba(15,23,42,.60);
+  letter-spacing:.2px;
+}
+.ui-input, .ui-select{
+  width:100%;
+  height:38px;
+  border-radius:12px;
+  border:1px solid var(--line);
+  background: var(--surfaceSolid);
+  padding: 0 12px;
+  outline:none;
+  font-size:12px;
+  color: rgba(15,23,42,.78);
+  font-weight:800;
+  transition: border-color .16s var(--ease), box-shadow .16s var(--ease);
+}
+.ui-input:hover, .ui-select:hover{ border-color: rgba(15,23,42,.18); }
+.ui-input:focus, .ui-select:focus{
+  border-color: rgba(var(--teal-rgb), .55);
+  box-shadow: 0 0 0 4px var(--focus);
+}
+
+.segmented{
+  display:flex;
+  gap:8px;
+  padding:4px;
+  border:1px solid rgba(15,23,42,.08);
+  border-radius:14px;
+  background: rgba(255,255,255,.78);
+}
+.seg-btn{
+  flex:1;
+  height:36px;
+  border:none;
+  border-radius:10px;
+  background:transparent;
+  color: rgba(15,23,42,.58);
+  font-size:12px;
+  font-weight:900;
+  cursor:pointer;
+  transition: background .16s var(--ease), color .16s var(--ease), transform .16s var(--ease);
+}
+.seg-btn.active{
+  background: rgba(255,255,255,.98);
+  color: rgba(15,23,42,.82);
+  box-shadow: 0 1px 2px rgba(16,24,40,.05);
+}
+.seg-btn:hover{ transform: translateY(-1px); }
+
+.action-row{
+  display:flex;
+  gap:8px;
+  flex-wrap:wrap;
+}
+
+.enter-btn{
+  height:38px;
+  min-width:110px;
+  padding:0 14px;
+  border-radius:12px;
+  border:1px solid rgba(15,23,42,.10);
+  background: rgba(var(--teal-rgb), .84);
+  color: rgba(255,255,255,.95);
+  font-weight:1000;
+  cursor:pointer;
+  box-shadow: 0 1px 2px rgba(16,24,40,.05);
+  transition: border-color .18s var(--ease), background .18s var(--ease), transform .18s var(--ease), box-shadow .18s var(--ease);
+}
+.enter-btn:hover{ border-color: var(--line2); background: rgba(var(--teal-rgb), .94); transform: translateY(-1px); box-shadow:0 10px 18px rgba(16,24,40,.06); }
+.enter-btn:disabled{ opacity:.55; cursor:not-allowed; transform:none; box-shadow:none; }
+
+.warn-btn{
+  background: rgba(var(--orange-rgb), .88);
+}
+.warn-btn:hover{
+  background: rgba(var(--orange-rgb), .96);
+}
+
+.danger-btn{
+  height:38px;
+  min-width:110px;
+  padding:0 14px;
+  border-radius:12px;
+  border:1px solid rgba(15,23,42,.10);
+  background: rgba(239,68,68,.88);
+  color:white;
+  font-weight:1000;
+  cursor:pointer;
+  transition: transform .18s var(--ease), box-shadow .18s var(--ease);
+}
+.danger-btn:hover{ transform:translateY(-1px); box-shadow:0 10px 18px rgba(16,24,40,.06); }
+
+.hidden{ display:none !important; }
+
+.table-card{
+  padding: 8px;
+}
+.table-head{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:10px;
+  margin-bottom:6px;
+}
+.toolbar{
+  display:grid;
+  grid-template-columns: 1.2fr 220px 120px;
+  gap:8px;
+  margin-bottom:8px;
+}
+.table-wrap{
+  border:1px solid rgba(15,23,42,.08);
+  border-radius:14px;
+  background: rgba(255,255,255,.78);
+  overflow:auto;
+}
+
+.table{
+  width:100%;
+  border-collapse:collapse;
+  table-layout:fixed;
+  font-variant-numeric: tabular-nums;
+}
+.table thead th{
+  font-size:11px;
+  font-weight:1000;
+  color: rgba(15,23,42,.58);
+  padding: 10px 10px;
+  border-bottom:1px solid rgba(15,23,42,.10);
+  background: rgba(255,255,255,.86);
+  position: sticky;
+  top: 0;
+  z-index: 2;
+  text-align:left;
+}
+.table tbody td{
+  padding: 10px 10px;
+  border-bottom:1px solid rgba(15,23,42,.06);
+  font-size:12px;
+  font-weight:800;
+  color: rgba(15,23,42,.74);
+  vertical-align:middle;
+}
+.table tbody tr:last-child td{ border-bottom:none; }
+
+.table th:nth-child(1), .table td:nth-child(1){ width:160px; }
+.table th:nth-child(2), .table td:nth-child(2){ width:auto; }
+.table th:nth-child(3), .table td:nth-child(3){ width:170px; }
+.table th:nth-child(4), .table td:nth-child(4){ width:100px; text-align:center; }
+
+.empty-state{
+  padding:18px;
+  font-size:12px;
+  font-weight:900;
+  color: rgba(15,23,42,.52);
+}
+
+.pager{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  gap:10px;
+  padding:10px 10px 6px;
+  border-top:1px solid rgba(15,23,42,.06);
+}
+.pager-actions{
+  display:flex;
+  gap:8px;
+  flex-wrap:wrap;
+}
+.pager-btn{
+  min-width:90px;
+  height:34px;
+  padding:0 12px;
+  border-radius:10px;
+  border:1px solid rgba(15,23,42,.10);
+  background:#fff;
+  color: rgba(15,23,42,.72);
+  font-size:12px;
+  font-weight:900;
+  cursor:pointer;
+}
+.pager-btn:disabled{
+  opacity:.5;
+  cursor:not-allowed;
+}
+
+.float-toast{
+  position: fixed;
+  right: 16px;
+  top: 16px;
+  width: min(380px, calc(100vw - 32px));
+  border-radius: 14px;
+  border:1px solid rgba(148,163,184,.45);
+  background: rgba(148,163,184,.18);
+  color: rgba(51,65,85,1);
+  padding: 10px 12px;
+  display:flex;
+  align-items:flex-start;
+  gap:10px;
+  font-size:12px;
+  font-weight:800;
+  opacity:0;
+  transform: translateY(-10px);
+  pointer-events:none;
+  transition: opacity .26s var(--ease), transform .26s var(--ease);
+  z-index:9999;
+  box-shadow: 0 10px 18px rgba(16,24,40,.10);
+}
+.float-toast.show{ opacity:1; transform:translateY(0); }
+.float-toast .icon{
+  width:22px; height:22px;
+  border-radius:999px;
+  display:grid; place-items:center;
+  flex:0 0 auto;
+  border:1px solid rgba(148,163,184,.45);
+  background: rgba(255,255,255,.60);
+  font-size:14px;
+}
+.float-toast.success{
+  border-color: var(--okBorder);
+  background: rgba(34,197,94,.10);
+  color: rgba(20,83,45,1);
+}
+.float-toast.warn{
+  border-color: var(--warnBorder);
+  background: rgba(245,158,11,.10);
+  color: rgba(120,72,0,1);
+}
+.float-toast.error{
+  border-color: var(--badBorder);
+  background: rgba(239,68,68,.10);
+  color: rgba(127,29,29,1);
+}
+
+@media (max-width: 980px){
+  .grid{ grid-template-columns:1fr; }
+  .toolbar{ grid-template-columns:1fr; }
+  .pager{ flex-direction:column; align-items:flex-start; }
+}
+</style>
+</head>
+
+<body>
+<header>
+  <div class="header-sheen"></div>
+
+  <div class="header-title">OHI • Innovative Care Solutions</div>
+  <div class="header-sub">Inventory Management</div>
+  <div class="header-tagline">Serialized assets · add · move · delete</div>
+
+  <div class="wave-layer" aria-hidden="true">
+    <svg class="wave-top" viewBox="0 0 1200 220" preserveAspectRatio="none">
+      <path d="M0,120 C70,10 140,210 210,120 C280,30 350,220 420,120 C490,10 560,210 630,120 C700,30 770,220 840,120 C910,10 980,210 1050,120 C1120,30 1160,180 1200,120"
+            fill="none" stroke="rgba(var(--orange-rgb),0.60)" stroke-width="22" stroke-linecap="round" />
+      <path d="M0,150 C90,40 180,240 270,150 C360,60 450,250 540,150 C630,40 720,240 810,150 C900,60 990,250 1080,150 C1140,120 1170,95 1200,80"
+            fill="none" stroke="rgba(var(--orange-rgb),0.30)" stroke-width="10" stroke-linecap="round" />
+    </svg>
+
+    <svg class="wave-mid" viewBox="0 0 1200 220" preserveAspectRatio="none">
+      <path d="M0,105 C80,210 160,0 240,105 C320,210 400,0 480,105 C560,210 640,0 720,105 C800,210 880,0 960,105 C1040,210 1120,0 1200,105"
+            fill="none" stroke="rgba(var(--teal-rgb),0.58)" stroke-width="12" stroke-linecap="round" />
+      <path d="M0,135 C90,240 180,30 270,135 C360,240 450,30 540,135 C630,240 720,30 810,135 C900,240 990,30 1080,135 C1140,175 1170,155 1200,145"
+            fill="none" stroke="rgba(var(--teal-rgb),0.32)" stroke-width="6" stroke-linecap="round" />
+      <path d="M0,92 C90,170 180,10 270,92 C360,170 450,10 540,92 C630,170 720,10 810,92 C900,170 990,10 1080,92 C1140,140 1170,125 1200,110"
+            fill="none" stroke="rgba(var(--teal-rgb),0.18)" stroke-width="3" stroke-linecap="round" />
+    </svg>
+
+    <svg class="wave-low" viewBox="0 0 1200 360" preserveAspectRatio="none">
+      <path d="M0,170 C120,300 240,40 360,160 C480,280 600,60 720,180 C840,300 960,40 1080,160 C1140,220 1170,255 1200,280 L1200,360 L0,360 Z"
+            fill="rgba(var(--teal-rgb),0.10)" />
+      <path d="M0,210 C150,340 300,90 450,200 C600,320 750,110 900,220 C1050,340 1120,250 1200,280 L1200,360 L0,360 Z"
+            fill="rgba(var(--orange-rgb),0.08)" />
+    </svg>
+  </div>
+</header>
+
+<div id="floatToast" class="float-toast" role="status" aria-live="polite" aria-atomic="true">
+  <div class="icon" id="ftIcon">✓</div>
+  <div>
+    <div id="ftTitle" style="font-weight:1000;">Ready</div>
+    <div id="ftMsg" style="margin-top:2px; opacity:.82;">Inventory tools online</div>
+  </div>
+</div>
+
+<main>
+  <div class="topbar">
+    <div class="topbar-left">
+      <a class="backlink-top" href="admin.html">
+        <span aria-hidden="true">←</span>
+        <span>Back to Admin</span>
+      </a>
+      <div>
+        <div class="orgline">OHI • Innovative Care Solutions</div>
+        <div class="addrline">Manage serialized assets across locations</div>
+      </div>
+    </div>
+
+    <a class="pill-lite" href="index.html" title="Choose IPU">
+      Choose IPU <span aria-hidden="true">›</span>
+    </a>
+  </div>
+
+  <div class="grid">
+    <section class="ui-card">
+      <div class="ui-card-title">
+        <span>Asset Actions</span>
+        <span class="ui-subtle">Create · move · remove</span>
+      </div>
+
+      <div class="segmented">
+        <button class="seg-btn active" data-mode="add" type="button">Add Asset</button>
+        <button class="seg-btn" data-mode="move" type="button">Move Asset</button>
+        <button class="seg-btn" data-mode="delete" type="button">Delete Asset</button>
+      </div>
+
+      <div class="stack" style="margin-top:10px;">
+        <div id="addFields" class="stack">
+          <div class="field-group">
+            <label class="field-label" for="addAsset">Asset Number</label>
+            <input id="addAsset" class="ui-input" />
+          </div>
+
+          <div class="field-group">
+            <label class="field-label" for="addItem">Item Type</label>
+            <select id="addItem" class="ui-select"></select>
+          </div>
+
+          <div class="field-group">
+            <label class="field-label" for="addLocation">Location</label>
+            <select id="addLocation" class="ui-select"></select>
+          </div>
+
+          <div class="action-row">
+            <button class="enter-btn" id="addBtn" type="button">Add Asset</button>
+          </div>
+        </div>
+
+        <div id="moveFields" class="stack hidden">
+          <div class="field-group">
+            <label class="field-label" for="moveAsset">Asset Number</label>
+            <input id="moveAsset" class="ui-input" />
+          </div>
+
+          <div class="field-group">
+            <label class="field-label" for="moveLocation">New Location</label>
+            <select id="moveLocation" class="ui-select"></select>
+          </div>
+
+          <div class="action-row">
+            <button class="enter-btn warn-btn" id="moveBtn" type="button">Move Asset</button>
+          </div>
+        </div>
+
+        <div id="deleteFields" class="stack hidden">
+          <div class="field-group">
+            <label class="field-label" for="deleteAsset">Asset Number</label>
+            <input id="deleteAsset" class="ui-input" />
+          </div>
+
+          <div class="action-row">
+            <button class="danger-btn" id="deleteBtn" type="button">Delete Asset</button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="ui-card table-card">
+      <div class="table-head">
+        <div class="ui-card-title" style="margin:0;">
+          <span>Asset Inventory</span>
+          <span class="ui-subtle">Search and refine results</span>
+        </div>
+        <div id="resultCount" class="ui-subtle">0 of 0</div>
+      </div>
+
+      <div class="toolbar">
+        <input id="searchBox" class="ui-input" placeholder="Search asset number or item" />
+        <select id="locationFilter" class="ui-select"></select>
+        <button class="enter-btn" id="searchBtn" type="button">Search</button>
+      </div>
+
+      <div class="table-wrap">
+        <table class="table">
+          <thead>
+            <tr>
+              <th>Asset Number</th>
+              <th>Item</th>
+              <th>Location</th>
+              <th>Location ID</th>
+            </tr>
+          </thead>
+          <tbody id="tableBody"></tbody>
+        </table>
+
+        <div id="emptyState" class="empty-state hidden">No assets found.</div>
+
+        <div class="pager">
+          <div id="pageInfo" class="ui-subtle">Page 1 of 1</div>
+          <div class="pager-actions">
+            <button class="pager-btn" id="prevBtn" type="button">Previous</button>
+            <button class="pager-btn" id="nextBtn" type="button">Next</button>
+          </div>
+        </div>
+      </div>
+    </section>
+  </div>
+</main>
+
+<script>
+const EDGE_URL = "https://sosyqdgeqgfuclffmzgl.supabase.co/functions/v1/IPU_Inventory";
+const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNvc3lxZGdlcWdmdWNsZmZtemdsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Njk3ODA0MjgsImV4cCI6MjA4NTM1NjQyOH0.quknRUYbRqvLMpsCKjlytN38hek5sk1v1o6KJEwTCxQ";
+
+const headers = {
+  "Content-Type": "application/json",
+  apikey: SUPABASE_ANON_KEY,
+  Authorization: "Bearer " + SUPABASE_ANON_KEY
+};
+
+const tableBody = document.getElementById("tableBody");
+const emptyState = document.getElementById("emptyState");
+const resultCount = document.getElementById("resultCount");
+
+const addAssetInput = document.getElementById("addAsset");
+const moveAssetInput = document.getElementById("moveAsset");
+const deleteAssetInput = document.getElementById("deleteAsset");
+
+const addItem = document.getElementById("addItem");
+const addLocation = document.getElementById("addLocation");
+const moveLocation = document.getElementById("moveLocation");
+const locationFilter = document.getElementById("locationFilter");
+
+const searchBox = document.getElementById("searchBox");
+
+const pageInfo = document.getElementById("pageInfo");
+const prevBtn = document.getElementById("prevBtn");
+const nextBtn = document.getElementById("nextBtn");
+
+const ft = document.getElementById("floatToast");
+const ftIcon = document.getElementById("ftIcon");
+const ftTitle = document.getElementById("ftTitle");
+const ftMsg = document.getElementById("ftMsg");
+
+const segButtons = document.querySelectorAll(".seg-btn");
+const addFields = document.getElementById("addFields");
+const moveFields = document.getElementById("moveFields");
+const deleteFields = document.getElementById("deleteFields");
+
+let toastTimer = null;
+let searchTimer = null;
+let locationMap = {};
+let allAssets = [];
+let filteredDbCount = 0;
+let totalDbCount = 0;
+let currentOffset = 0;
+let currentLimit = 100;
+let currentQuery = "";
+
+function notify(type, title, msg) {
+  const iconMap = { success: "✓", warn: "!", error: "✕" };
+  ft.classList.remove("success", "warn", "error");
+  ft.classList.add(type);
+  ftIcon.textContent = iconMap[type] || "✓";
+  ftTitle.textContent = title;
+  ftMsg.textContent = msg;
+  ft.classList.add("show");
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => ft.classList.remove("show"), 2600);
+}
+
+async function callEdge(payload) {
+  const res = await fetch(EDGE_URL, {
+    method: "POST",
+    headers,
+    body: JSON.stringify(payload)
+  });
+
+  let data = {};
+  try {
+    data = await res.json();
+  } catch {
+    throw new Error("Invalid JSON response");
+  }
+
+  if (!res.ok) {
+    throw new Error(data.details || data.error || "Request failed");
+  }
+
+  return data;
+}
+
+function fillSelect(select, items, placeholder) {
+  select.innerHTML = "";
+
+  const first = document.createElement("option");
+  first.value = "";
+  first.textContent = placeholder;
+  select.appendChild(first);
+
+  items.forEach(item => {
+    const opt = document.createElement("option");
+    opt.value = item.id;
+    opt.textContent = item.name;
+    select.appendChild(opt);
+  });
+}
+
+function setMode(mode) {
+  segButtons.forEach(btn => {
+    btn.classList.toggle("active", btn.dataset.mode === mode);
+  });
+
+  addFields.classList.toggle("hidden", mode !== "add");
+  moveFields.classList.toggle("hidden", mode !== "move");
+  deleteFields.classList.toggle("hidden", mode !== "delete");
+}
+
+function updatePager() {
+  const totalPages = Math.max(1, Math.ceil(filteredDbCount / currentLimit));
+  const currentPage = Math.floor(currentOffset / currentLimit) + 1;
+
+  pageInfo.textContent = `Page ${currentPage} of ${totalPages}`;
+  prevBtn.disabled = currentOffset === 0;
+  nextBtn.disabled = currentOffset + currentLimit >= filteredDbCount;
+}
+
+async function loadItemsAndLocations() {
+  const [itemsRes, locationsRes] = await Promise.all([
+    callEdge({ action: "list_items" }),
+    callEdge({ action: "list_locations" })
+  ]);
+
+  const sortedItems = (itemsRes.items || []).sort((a, b) =>
+    (a.name || "").localeCompare(b.name || "")
+  );
+
+  fillSelect(addItem, sortedItems, "Select item");
+  fillSelect(addLocation, locationsRes.locations || [], "Select location");
+  fillSelect(moveLocation, locationsRes.locations || [], "Select location");
+
+  locationFilter.innerHTML = "";
+  locationMap = {};
+
+  const allOpt = document.createElement("option");
+  allOpt.value = "";
+  allOpt.textContent = "All locations";
+  locationFilter.appendChild(allOpt);
+
+  (locationsRes.locations || []).forEach(loc => {
+    locationMap[String(loc.id)] = loc.name;
+
+    const opt = document.createElement("option");
+    opt.value = loc.id;
+    opt.textContent = loc.name;
+    locationFilter.appendChild(opt);
+  });
+}
+
+async function loadTable() {
+  try {
+    const location_id = locationFilter.value || null;
+    const q = searchBox.value.trim();
+
+    currentQuery = q;
+
+    const payload = {
+      action: "search_assets",
+      limit: currentLimit,
+      offset: currentOffset,
+      q
+    };
+
+    if (location_id) {
+      payload.location_id = Number(location_id);
+    }
+
+    const data = await callEdge(payload);
+
+    allAssets = data.assets || [];
+    filteredDbCount = data.filtered_count || 0;
+    totalDbCount = data.total_count || 0;
+
+    renderTable();
+  } catch (err) {
+    console.error(err);
+    tableBody.innerHTML = "";
+    emptyState.classList.remove("hidden");
+    emptyState.textContent = "Failed to load assets.";
+    resultCount.textContent = "0 of 0";
+    filteredDbCount = 0;
+    totalDbCount = 0;
+    updatePager();
+    notify("error", "Load failed", String(err.message || err));
+  }
+}
+
+function renderTable() {
+  tableBody.innerHTML = "";
+
+  if (!allAssets.length) {
+    emptyState.classList.remove("hidden");
+    emptyState.textContent = "No assets found.";
+  } else {
+    emptyState.classList.add("hidden");
+  }
+
+  allAssets.forEach(a => {
+    const tr = document.createElement("tr");
+    const locationName =
+      a.locations?.name ||
+      locationMap[String(a.location_id)] ||
+      `Location ${a.location_id}`;
+
+    tr.innerHTML = `
+      <td>${a.asset_number || ""}</td>
+      <td>${a.items?.name || ""}</td>
+      <td>${locationName}</td>
+      <td>${a.location_id ?? ""}</td>
+    `;
+
+    tableBody.appendChild(tr);
+  });
+
+  if (filteredDbCount === 0) {
+    resultCount.textContent = `0 of ${totalDbCount}`;
+    updatePager();
+    return;
+  }
+
+  const start = currentOffset + 1;
+  const end = Math.min(currentOffset + allAssets.length, filteredDbCount);
+
+  if (!currentQuery) {
+    if (start === end) {
+      resultCount.textContent = `${end} of ${filteredDbCount} · total ${totalDbCount}`;
+      updatePager();
+      return;
+    }
+
+    resultCount.textContent = `${start}-${end} of ${filteredDbCount} · total ${totalDbCount}`;
+    updatePager();
+    return;
+  }
+
+  if (start === end) {
+    resultCount.textContent = `${end} of ${filteredDbCount} matching · total ${totalDbCount}`;
+    updatePager();
+    return;
+  }
+
+  resultCount.textContent = `${start}-${end} of ${filteredDbCount} matching · total ${totalDbCount}`;
+  updatePager();
+}
+
+async function addAsset() {
+  try {
+    const asset_number = addAssetInput.value.trim();
+    const item_id = addItem.value;
+    const location_id = addLocation.value;
+
+    if (!asset_number || !item_id || !location_id) {
+      notify("warn", "Missing fields", "Complete all fields.");
+      return;
+    }
+
+    const data = await callEdge({
+      action: "create_asset",
+      asset_number,
+      item_id: Number(item_id),
+      location_id: Number(location_id)
+    });
+
+    if (data.status === "asset_number_taken") {
+      notify("warn", "Duplicate asset", "That asset already exists.");
+      return;
+    }
+
+    addAssetInput.value = "";
+    addItem.value = "";
+    addLocation.value = "";
+
+    notify("success", "Asset added", asset_number);
+    currentOffset = 0;
+    await loadTable();
+  } catch (err) {
+    console.error(err);
+    notify("error", "Add failed", String(err.message || err));
+  }
+}
+
+async function moveAsset() {
+  try {
+    const asset_number = moveAssetInput.value.trim();
+    const location_id = moveLocation.value;
+
+    if (!asset_number || !location_id) {
+      notify("warn", "Missing fields", "Enter asset and location.");
+      return;
+    }
+
+    const existing = await callEdge({
+      action: "get_asset",
+      asset_number
+    });
+
+    if (existing.status === "not_found" || !existing.asset) {
+      notify("warn", "Not found", "Asset does not exist.");
+      return;
+    }
+
+    await callEdge({
+      action: "move_asset",
+      id: Number(existing.asset.id),
+      location_id: Number(location_id)
+    });
+
+    moveAssetInput.value = "";
+    moveLocation.value = "";
+
+    notify("success", "Asset moved", asset_number);
+    await loadTable();
+  } catch (err) {
+    console.error(err);
+    notify("error", "Move failed", String(err.message || err));
+  }
+}
+
+async function deleteAsset() {
+  try {
+    const asset_number = deleteAssetInput.value.trim();
+
+    if (!asset_number) {
+      notify("warn", "Missing asset", "Enter asset number.");
+      return;
+    }
+
+    const existing = await callEdge({
+      action: "get_asset",
+      asset_number
+    });
+
+    if (existing.status === "not_found" || !existing.asset) {
+      notify("warn", "Not found", "Asset does not exist.");
+      return;
+    }
+
+    await callEdge({
+      action: "delete_asset",
+      id: Number(existing.asset.id)
+    });
+
+    deleteAssetInput.value = "";
+
+    notify("success", "Asset deleted", asset_number);
+    currentOffset = 0;
+    await loadTable();
+  } catch (err) {
+    console.error(err);
+    notify("error", "Delete failed", String(err.message || err));
+  }
+}
+
+function triggerSearchNow() {
+  clearTimeout(searchTimer);
+  currentOffset = 0;
+  loadTable();
+}
+
+document.getElementById("addBtn").addEventListener("click", addAsset);
+document.getElementById("moveBtn").addEventListener("click", moveAsset);
+document.getElementById("deleteBtn").addEventListener("click", deleteAsset);
+
+document.getElementById("searchBtn").addEventListener("click", () => {
+  triggerSearchNow();
+});
+
+locationFilter.addEventListener("change", async () => {
+  currentOffset = 0;
+  await loadTable();
+});
+
+searchBox.addEventListener("input", () => {
+  clearTimeout(searchTimer);
+
+  searchTimer = setTimeout(async () => {
+    currentOffset = 0;
+    await loadTable();
+  }, 300);
+});
+
+searchBox.addEventListener("keydown", async (e) => {
+  if (e.key === "Enter") {
+    e.preventDefault();
+    triggerSearchNow();
+  }
+});
+
+prevBtn.addEventListener("click", async () => {
+  if (currentOffset === 0) return;
+  currentOffset = Math.max(0, currentOffset - currentLimit);
+  await loadTable();
+});
+
+nextBtn.addEventListener("click", async () => {
+  if (currentOffset + currentLimit >= filteredDbCount) return;
+  currentOffset += currentLimit;
+  await loadTable();
+});
+
+segButtons.forEach(btn => {
+  btn.addEventListener("click", () => setMode(btn.dataset.mode));
+});
+
+(async function init() {
+  try {
+    setMode("add");
+    await loadItemsAndLocations();
+    await loadTable();
+    notify("success", "Ready", "Inventory management online.");
+  } catch (err) {
+    console.error(err);
+    notify("error", "Init failed", String(err.message || err));
+  }
+})();
+</script>
+</body>
+</html>
