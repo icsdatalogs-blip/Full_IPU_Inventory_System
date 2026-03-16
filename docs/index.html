@@ -1,1332 +1,1316 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>IPU Inventory</title>
-
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
-
-<style>
-:root{
-  --bgTop:#ffffff; --bgBot:#f4f6f9;
-
-  --ink: rgba(15,23,42,.82);
-  --ink2: rgba(15,23,42,.72);
-  --muted: rgba(15,23,42,.55);
-  --muted2: rgba(15,23,42,.45);
-
-  --teal-rgb: 20,137,168;
-  --orange-rgb: 243,112,33;
-
-  --surface: rgba(255,255,255,.94);
-  --surfaceSolid:#ffffff;
-  --surface2:#fbfcfd;
-
-  --line: rgba(15, 23, 42, .10);
-  --line2: rgba(15, 23, 42, .16);
-  --shadow: 0 1px 2px rgba(16,24,40,.05), 0 10px 25px rgba(16,24,40,.06);
-
-  --radius: 18px;
-  --ease: cubic-bezier(.2,.8,.2,1);
-  --focus: rgba(var(--teal-rgb), .18);
-
-  --okBg: rgba(34,197,94,.18);
-  --okBorder: rgba(34,197,94,.55);
-  --okInk: rgba(21,128,61,1);
-
-  --warnBg: rgba(245,158,11,.20);
-  --warnBorder: rgba(245,158,11,.55);
-  --warnInk: rgba(161,98,7,1);
-
-  --badBg: rgba(239,68,68,.18);
-  --badBorder: rgba(239,68,68,.55);
-  --badInk: rgba(153,27,27,1);
-
-  --neutralBg: rgba(148,163,184,.20);
-  --neutralBorder: rgba(148,163,184,.55);
-  --neutralInk: rgba(51,65,85,1);
-}
-
-*{ box-sizing:border-box; font-family: Inter, system-ui, -apple-system, BlinkMacSystemFont, sans-serif; }
-html, body { height: 100%; }
-
-body{
-  margin:0;
-  color: var(--ink);
-  background: linear-gradient(to bottom, var(--bgTop) 0%, var(--bgTop) 240px, var(--bgBot) 240px, var(--bgBot) 100%);
-  overflow: hidden;
-}
-
-header{
-  text-align:center;
-  padding: 34px 18px 12px;
-  position:relative;
-  overflow:hidden;
-}
-.header-sheen{
-  position:absolute; left:50%; top:16px; transform:translateX(-50%);
-  width:min(860px, 94vw); height:110px;
-  background: radial-gradient(320px 100px at 50% 45%,
-      rgba(255,255,255,0.92),
-      rgba(255,255,255,0.55) 55%,
-      rgba(255,255,255,0.0) 78%);
-  pointer-events:none; z-index:1;
-}
-.header-title,.header-sub,.header-tagline{ position:relative; z-index:2; }
-.header-title{ font-size:19px; font-weight:800; letter-spacing:.7px; color: var(--ink2); }
-.header-sub{ font-size:11px; margin-top:4px; letter-spacing:1px; color:rgba(0,0,0,.50); text-transform:uppercase; font-weight:700; }
-.header-tagline{ margin-top:8px; font-size:12px; color:rgba(0,0,0,.50); letter-spacing:.25px; font-weight:500; }
-
-.wave-layer{ position:absolute; bottom:40px; left:0; width:100%; height:140px; pointer-events:none; z-index:0; }
-.wave-layer svg{ position:absolute; inset:0; width:120%; left:-10%; height:100%; display:block; opacity:.40; filter:saturate(1.02); }
-.wave-top{ transform: translateY(-8px); }
-.wave-mid{ transform: translateY(1px); }
-.wave-low{ transform: translateY(10px); }
-
-main{
-  max-width:1160px;
-  margin:0 auto;
-  padding: 0 12px 14px;
-  height: calc(100vh - 168px);
-  display:flex;
-  flex-direction:column;
-  gap: 8px;
-  min-height:0;
-}
-
-.topbar{
-  display:flex;
-  align-items:flex-start;
-  justify-content:space-between;
-  gap:12px;
-  padding: 6px 6px 0;
-}
-.topbar-left{ display:flex; flex-direction:column; gap:6px; text-align:left; }
-
-.backlink-top{
-  display:inline-flex; align-items:center; gap:10px;
-  text-decoration:none; color: rgba(15,23,42,.58);
-  font-weight:800; width: fit-content;
-  transition: color .16s var(--ease), transform .16s var(--ease);
-}
-.backlink-top:hover{ color: rgba(15,23,42,.70); transform: translateY(-1px); }
-.backlink-top:active{ transform: translateY(0px); }
-.backlink-top:focus-visible{ outline:none; box-shadow:0 0 0 4px var(--focus); border-radius:12px; padding:6px 8px; }
-
-.orgline{ font-size:12px; font-weight:800; color: var(--muted); }
-.addrline{ margin-top:1px; font-size:11px; color: var(--muted2); font-weight:600; }
-
-.admin-btn{
-  display:inline-flex; align-items:center; gap:10px;
-  padding:9px 11px; border-radius:12px;
-  border:1px solid var(--line);
-  background: rgba(255,255,255,.92);
-  box-shadow:0 1px 2px rgba(16,24,40,.06);
-  color: rgba(15,23,42,.62);
-  font-weight:800;
-  text-decoration:none;
-  transition: border-color .18s var(--ease), transform .18s var(--ease), background .18s var(--ease), box-shadow .18s var(--ease);
-  height: 40px;
-}
-.admin-btn:hover{ border-color: var(--line2); background: rgba(255,255,255,.98); transform: translateY(-1px); box-shadow:0 10px 18px rgba(16,24,40,.06); }
-.admin-btn:active{ transform: translateY(0px); }
-.admin-btn:focus-visible{ outline:none; box-shadow:0 0 0 4px var(--focus), 0 10px 18px rgba(16,24,40,.06); }
-.admin-btn svg{ width:18px; height:18px; }
-
-.lanes{
-  display:grid;
-  grid-template-columns: 1.1fr .28fr .9fr;
-  align-items:center;
-  gap:14px;
-  padding: 0 6px;
-}
-.lane-title{
-  display:flex; align-items:center; gap:12px;
-  color: rgba(15,23,42,.58);
-  font-weight:900;
-  justify-content:center;
-}
-.lane-title::before,.lane-title::after{ content:""; height:1px; flex:1 1 auto; background: rgba(15,23,42,.10); }
-.lane-title span{ font-size:16px; padding:2px 8px; }
-.or-pill{ display:grid; place-items:center; }
-.or-pill span{
-  width:40px; height:40px; border-radius:999px;
-  display:grid; place-items:center;
-  font-weight:1000; letter-spacing:.7px;
-  color:#fff;
-  background: rgba(var(--orange-rgb), .94);
-  box-shadow:0 10px 18px rgba(16,24,40,.08);
-  border:1px solid rgba(255,255,255,.35);
-  font-size:12px;
-}
-
-.grid{
-  display:grid;
-  grid-template-columns: 1.1fr .9fr;
-  gap: 14px;
-  align-items:stretch;
-  padding: 0 6px;
-  flex: 1 1 auto;
-  min-height:0;
-}
-
-.left{
-  display:flex;
-  flex-direction:column;
-  gap: 10px;
-  min-height:0;
-  overflow:auto;
-  padding-bottom: 4px;
-}
-
-.right{
-  min-height:0;
-  display:flex;
-}
-
-.ui-card{
-  background: var(--surface);
-  border:1px solid var(--line);
-  border-radius: var(--radius);
-  box-shadow: var(--shadow);
-  padding: 12px;
-  position:relative;
-}
-.ui-card::before{
-  content:""; position:absolute; inset:8px;
-  border-radius: calc(var(--radius) - 8px);
-  pointer-events:none;
-  background:
-    radial-gradient(70px 70px at 18% 20%, rgba(var(--orange-rgb),.10), transparent 65%),
-    radial-gradient(90px 90px at 78% 62%, rgba(var(--teal-rgb),.09), transparent 70%);
-  opacity:.85;
-}
-.ui-card > *{ position:relative; z-index:1; }
-
-.ui-card-title{
-  display:flex; align-items:center; justify-content:space-between;
-  gap:12px;
-  font-size:14px;
-  font-weight:900;
-  color: rgba(15,23,42,.74);
-  margin-bottom: 8px;
-}
-.ui-subtle{ font-size:11px; color: rgba(15,23,42,.52); font-weight:700; }
-
-#scanCard{
-  background: rgba(255,255,255,0.96);
-  border:1px solid rgba(var(--orange-rgb), 0.22);
-  box-shadow:
-    0 1px 2px rgba(16,24,40,.05),
-    0 10px 25px rgba(16,24,40,.06),
-    0 0 0 4px rgba(var(--orange-rgb), 0.045);
-}
-
-.ui-input-wrap{ position:relative; }
-.scan-row{
-  display:grid;
-  grid-template-columns: 1fr auto;
-  gap:10px;
-  align-items:center;
-}
-.ui-search{
-  position:absolute; left:12px; top:50%; transform:translateY(-50%);
-  opacity:.55; width:17px; height:17px;
-}
-.ui-input{
-  width:100%; height:42px;
-  border-radius:14px;
-  border:1px solid var(--line);
-  background: var(--surfaceSolid);
-  padding: 0 12px 0 40px;
-  outline:none;
-  font-size:13px;
-  color: rgba(15,23,42,.78);
-  font-weight:700;
-  transition: border-color .16s var(--ease), box-shadow .16s var(--ease);
-}
-.ui-input:hover{ border-color: rgba(15,23,42,.18); }
-.ui-input:focus{ border-color: rgba(var(--teal-rgb), .55); box-shadow: 0 0 0 4px var(--focus); }
-
-.enter-btn{
-  height:42px;
-  min-width: 108px;
-  padding:0 14px;
-  border-radius:14px;
-  border:1px solid rgba(15,23,42,.10);
-  background: rgba(var(--teal-rgb), .64);
-  color: rgba(15,23,42,.70);
-  font-weight:1000;
-  display:inline-flex; align-items:center; justify-content:center; gap:10px;
-  cursor:pointer;
-  box-shadow: 0 1px 2px rgba(16,24,40,.05);
-  transition: border-color .18s var(--ease), background .18s var(--ease), transform .18s var(--ease), box-shadow .18s var(--ease);
-}
-.enter-btn:hover{ border-color: var(--line2); background: rgba(var(--teal-rgb), .84); transform: translateY(-1px); box-shadow:0 10px 18px rgba(16,24,40,.06); }
-.enter-btn:active{ transform: translateY(0px); }
-.enter-btn:focus-visible{ outline:none; box-shadow: 0 0 0 4px var(--focus), 0 10px 18px rgba(16,24,40,.06); }
-.enter-btn:disabled{ opacity:.55; cursor:not-allowed; transform:none; box-shadow:none; }
-.enter-btn svg{ width:18px; height:18px; opacity:.85; }
-
-.toast{
-  margin-top: 8px;
-  border-radius:14px;
-  border:1px solid var(--neutralBorder);
-  background: var(--neutralBg);
-  color: var(--neutralInk);
-  padding: 9px 10px;
-  display:flex; align-items:flex-start; gap:10px;
-  font-size:12px; font-weight:700;
-  opacity:0; transform: translateY(-8px);
-  pointer-events:none;
-  transition: opacity .28s var(--ease), transform .28s var(--ease), border-color .18s var(--ease), background .18s var(--ease), color .18s var(--ease);
-}
-.toast strong{ font-weight:900; }
-
-.toast .icon{
-  width:18px; height:18px;
-  display:grid; place-items:center;
-  flex:0 0 auto;
-  font-size:15px; line-height:1;
-  border-radius:999px;
-  border:1px solid var(--neutralBorder);
-  background: rgba(255,255,255,.55);
-  color: var(--neutralInk);
-}
-
-.toast.pending{
-  border-color: var(--neutralBorder);
-  background: var(--neutralBg);
-  color: var(--neutralInk);
-}
-.toast.pending .icon{
-  border-color: var(--neutralBorder);
-  color: var(--neutralInk);
-}
-
-.toast.success{
-  border-color: rgba(34,197,94,.18);
-  background: rgba(34,197,94,.10);
-  color: rgba(20,83,45,1);
-}
-.toast.success .icon{
-  border-color: rgba(34,197,94,.55);
-  color: var(--okInk);
-}
-
-.toast.warn{
-  border-color: var(--warnBorder);
-  background: var(--warnBg);
-  color: rgba(120,72,0,1);
-}
-.toast.warn .icon{
-  border-color: var(--warnBorder);
-  color: var(--warnInk);
-}
-
-.toast.error{
-  border-color: var(--badBorder);
-  background: var(--badBg);
-  color: rgba(127,29,29,1);
-}
-.toast.error .icon{
-  border-color: var(--badBorder);
-  color: var(--badInk);
-}
-
-.toast.show{ opacity:1; transform: translateY(0); }
-.toast.hide{ opacity:0; transform: translateY(-8px); }
-
-.last-scan-banner{
-  border-radius:14px;
-  border:1px solid rgba(34,197,94,.18);
-  background: rgba(34,197,94,.10);
-  color: rgba(20,83,45,1);
-  padding: 9px 10px;
-  display:flex; align-items:flex-start; gap:10px;
-  font-size:12px; font-weight:700;
-}
-.last-scan-banner strong{ font-weight:900; }
-.last-scan-banner .checkmark{
-  width:18px; height:18px; display:grid; place-items:center;
-  color: var(--okInk);
-  flex:0 0 auto;
-  font-size:16px; line-height:1;
-}
-.last-scan-banner .ls-item{ font-weight:900; color: rgba(20,83,45,1); }
-
-.undo-btn{
-  width:100%; height:40px;
-  border-radius:14px;
-  border:1px solid rgba(var(--orange-rgb), .45);
-  background: rgba(255,255,255,.92);
-  color: rgba(170, 84, 25, 1);
-  font-weight:900;
-  transition: border-color .18s var(--ease), background .18s var(--ease), transform .18s var(--ease), box-shadow .18s var(--ease);
-}
-.undo-btn:hover{ background:#fff; border-color: rgba(var(--orange-rgb), .70); transform: translateY(-1px); box-shadow:0 10px 18px rgba(16,24,40,.06); }
-.undo-btn:active{ transform: translateY(0px); }
-.undo-btn:focus-visible{ outline:none; box-shadow:0 0 0 4px rgba(var(--orange-rgb), .18), 0 10px 18px rgba(16,24,40,.06); }
-.undo-btn:disabled{ opacity:.55; cursor:not-allowed; transform:none; box-shadow:none; }
-
-.link-btn{
-  width:100%; height:42px;
-  border-radius:14px;
-  border:1px solid var(--line);
-  background: rgba(255,255,255,.90);
-  color: rgba(15,23,42,.62);
-  font-weight:900;
-  display:flex; align-items:center; justify-content:center; gap:10px;
-  text-decoration:none;
-  box-shadow: 0 1px 2px rgba(16,24,40,.05);
-  cursor:pointer;
-  transition: border-color .18s var(--ease), background .18s var(--ease), transform .18s var(--ease), box-shadow .18s var(--ease);
-}
-.link-btn:hover{ border-color: var(--line2); background: rgba(255,255,255,.96); transform: translateY(-1px); box-shadow:0 10px 18px rgba(16,24,40,.06); }
-.link-btn:active{ transform: translateY(0px); }
-.link-btn:focus-visible{ outline:none; box-shadow: 0 0 0 4px var(--focus), 0 10px 18px rgba(16,24,40,.06); }
-
-.dot{
-  width:16px; height:16px;
-  border-radius:999px;
-  display:grid; place-items:center;
-  border:1px solid rgba(15,23,42,.10);
-  flex:0 0 auto;
-}
-.dot svg{ width:11px; height:11px; }
-.dot svg path{ stroke-width:2.4; }
-.dot.ok{ background: var(--okBg); border-color: var(--okBorder); }
-.dot.ok svg path{ stroke: var(--okInk); }
-.dot.warn{ background: var(--warnBg); border-color: var(--warnBorder); }
-.dot.warn svg path{ stroke: var(--warnInk); }
-.dot.bad{ background: var(--badBg); border-color: var(--badBorder); }
-.dot.bad svg path{ stroke: var(--badInk); }
-
-.pill{
-  display:inline-flex; align-items:center; justify-content:center;
-  min-width:74px; height:24px; padding:0 10px;
-  border-radius:999px;
-  font-size:11px; font-weight:900;
-  border:1px solid rgba(15,23,42,.10);
-  background: var(--surface2);
-  color: rgba(15,23,42,.62);
-  font-variant-numeric: tabular-nums;
-}
-.pill.ok{ background: rgba(34,197,94,.16); border-color: rgba(34,197,94,.50); color: var(--okInk); }
-.pill.warn{ background: rgba(245,158,11,.18); border-color: rgba(245,158,11,.55); color: var(--warnInk); }
-.pill.bad{ background: rgba(239,68,68,.16); border-color: rgba(239,68,68,.55); color: var(--badInk); }
-
-.signout-card{
-  width:100%;
-  height:100%;
-  display:flex;
-  flex-direction:column;
-  min-height:0;
-  padding: 12px;
-}
-.signout-head{
-  display:flex; align-items:flex-start; justify-content:space-between;
-  gap:10px;
-  margin-bottom: 8px;
-}
-.signout-title{ font-size:16px; font-weight:1000; color: rgba(15,23,42,.74); }
-.signout-sub{ font-size:11px; font-weight:700; color: rgba(15,23,42,.52); margin-top:2px; }
-
-.signout-list{
-  border-top:1px solid rgba(15,23,42,.08);
-  margin-top:6px; padding-top:6px;
-  display:flex; flex-direction:column; gap:6px;
-  min-height:0;
-  overflow:auto;
-  padding-right: 4px;
-}
-
-.signout-row{
-  display:grid;
-  grid-template-columns: 1fr auto auto;
-  gap:10px;
-  align-items:center;
-  padding: 7px 9px;
-  border-radius:14px;
-  border:1px solid rgba(15,23,42,.06);
-  background: rgba(255,255,255,.85);
-}
-.itemcell{ display:flex; align-items:center; gap:9px; min-width:0; }
-.itemname{
-  font-weight:800;
-  font-size:12px;
-  color: rgba(15,23,42,.74);
-  overflow:hidden; text-overflow: ellipsis; white-space: nowrap;
-}
-
-.take1{
-  height:28px; padding:0 11px;
-  border-radius:999px;
-  border:1px solid rgba(15,23,42,.10);
-  background: rgba(var(--orange-rgb), .94);
-  color:#fff;
-  font-weight:1000;
-  display:inline-flex; align-items:center; gap:8px;
-  cursor:pointer;
-  transition: transform .16s var(--ease), box-shadow .16s var(--ease), filter .16s var(--ease);
-  font-size:12px;
-}
-.take1:hover{ transform: translateY(-1px); box-shadow:0 10px 18px rgba(16,24,40,.08); filter: brightness(.99); }
-.take1:active{ transform: translateY(0px); }
-.take1:focus-visible{ outline:none; box-shadow:0 0 0 4px rgba(var(--orange-rgb), .20), 0 10px 18px rgba(16,24,40,.08); }
-.take1:disabled{ opacity:.55; cursor:not-allowed; transform:none; box-shadow:none; }
-.take1 small{ font-weight:1000; opacity:.92; }
-
-.empty-state{
-  border:1px dashed rgba(15,23,42,.14);
-  background: rgba(255,255,255,.72);
-  border-radius:14px;
-  padding:14px;
-  text-align:center;
-  font-size:12px;
-  font-weight:800;
-  color: rgba(15,23,42,.52);
-}
-
-footer{
-  text-align:center;
-  padding: 6px 10px 2px;
-  color: rgba(0,0,0,0.38);
-  font-size: 11px;
-  letter-spacing: .2px;
-}
-
-.signout-list::-webkit-scrollbar,
-.left::-webkit-scrollbar{ width: 10px; }
-.signout-list::-webkit-scrollbar-thumb,
-.left::-webkit-scrollbar-thumb{
-  background: rgba(15,23,42,.12);
-  border-radius: 999px;
-  border: 3px solid rgba(255,255,255,.65);
-}
-.signout-list::-webkit-scrollbar-track,
-.left::-webkit-scrollbar-track{ background: transparent; }
-
-@media (max-width: 980px){
-  body{ overflow:auto; }
-  main{ height:auto; min-height: calc(100vh - 160px); }
-  .lanes{ grid-template-columns: 1fr; }
-  .or-pill{ display:none; }
-  .grid{ grid-template-columns: 1fr; }
-  .right{ height: auto; }
-  .signout-card{ height:auto; }
-  .signout-list{ max-height: 45vh; }
-  .left{ overflow: visible; }
-}
-
-@media (prefers-reduced-motion: reduce){
-  .toast{ transition:none; opacity:1; transform:none; }
-  .admin-btn, .backlink-top, .undo-btn, .link-btn, .take1, .enter-btn{ transition:none; }
-}
-</style>
-</head>
-
-<body>
-<header>
-  <div class="header-sheen"></div>
-
-  <div class="header-title">OHI • Innovative Care Solutions</div>
-  <div class="header-sub">Inventory Portal</div>
-  <div class="header-tagline">Par levels, scan tools, &amp; shortage reporting</div>
-
-  <div class="wave-layer" aria-hidden="true">
-    <svg class="wave-top" viewBox="0 0 1200 220" preserveAspectRatio="none">
-      <path d="M0,120 C70,10 140,210 210,120 C280,30 350,220 420,120 C490,10 560,210 630,120 C700,30 770,220 840,120 C910,10 980,210 1050,120 C1120,30 1160,180 1200,120"
-            fill="none" stroke="rgba(var(--orange-rgb),0.60)" stroke-width="22" stroke-linecap="round" />
-      <path d="M0,150 C90,40 180,240 270,150 C360,60 450,250 540,150 C630,40 720,240 810,150 C900,60 990,250 1080,150 C1140,120 1170,95 1200,80"
-            fill="none" stroke="rgba(var(--orange-rgb),0.30)" stroke-width="10" stroke-linecap="round" />
-    </svg>
-
-    <svg class="wave-mid" viewBox="0 0 1200 220" preserveAspectRatio="none">
-      <path d="M0,105 C80,210 160,0 240,105 C320,210 400,0 480,105 C560,210 640,0 720,105 C800,210 880,0 960,105 C1040,210 1120,0 1200,105"
-            fill="none" stroke="rgba(var(--teal-rgb),0.58)" stroke-width="12" stroke-linecap="round" />
-      <path d="M0,135 C90,240 180,30 270,135 C360,240 450,30 540,135 C630,240 720,30 810,135 C900,240 990,30 1080,135 C1140,175 1170,155 1200,145"
-            fill="none" stroke="rgba(var(--teal-rgb),0.32)" stroke-width="6" stroke-linecap="round" />
-      <path d="M0,92 C90,170 180,10 270,92 C360,170 450,10 540,92 C630,170 720,10 810,92 C900,170 990,10 1080,92 C1140,140 1170,125 1200,110"
-            fill="none" stroke="rgba(var(--teal-rgb),0.18)" stroke-width="3" stroke-linecap="round" />
-    </svg>
-
-    <svg class="wave-low" viewBox="0 0 1200 360" preserveAspectRatio="none">
-      <path d="M0,170 C120,300 240,40 360,160 C480,280 600,60 720,180 C840,300 960,40 1080,160 C1140,220 1170,255 1200,280 L1200,360 L0,360 Z"
-            fill="rgba(var(--teal-rgb),0.10)" />
-      <path d="M0,210 C150,340 300,90 450,200 C600,320 750,110 900,220 C1050,340 1120,250 1200,280 L1200,360 L0,360 Z"
-            fill="rgba(var(--orange-rgb),0.08)" />
-    </svg>
-  </div>
-</header>
-
-<main>
-  <div class="topbar">
-    <div class="topbar-left">
-      <a class="backlink-top" href="index.html" aria-label="Choose location">
-        <span aria-hidden="true">←</span> <span>Choose location</span>
-      </a>
-
-      <div>
-        <div class="orgline">OHI • Innovative Care Solutions</div>
-        <div class="addrline" id="addrLine">324 Wilmington Ave, Dayton, OH 45420</div>
-      </div>
-    </div>
-
-    <a class="admin-btn" href="#" id="adminBtn">
-      <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
-        <path d="M12 2l8 4v6c0 5-3.5 9.5-8 10-4.5-.5-8-5-8-10V6l8-4Z"
-              stroke="rgba(var(--teal-rgb),.95)" stroke-width="1.8" stroke-linejoin="round"/>
-        <path d="M9.2 12.2l1.8 1.8 3.8-3.8"
-              stroke="rgba(var(--orange-rgb),.95)" stroke-width="1.8" stroke-linecap="round"/>
-      </svg>
-      Admin <span aria-hidden="true">›</span>
-    </a>
-  </div>
-
-  <div class="lanes" aria-hidden="true">
-    <div class="lane-title"><span>Scan Out</span></div>
-    <div class="or-pill"><span>OR</span></div>
-    <div class="lane-title"><span>Sign Out</span></div>
-  </div>
-
-  <div class="grid">
-    <div class="left">
-      <section class="ui-card" id="scanCard">
-        <div class="ui-card-title">
-          <span id="ipuTitle">Dayton IPU</span>
-          <span class="ui-subtle">Scanner</span>
-        </div>
-
-        <div class="scan-row">
-          <div class="ui-input-wrap">
-            <svg class="ui-search" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-              <path d="M10.5 18a7.5 7.5 0 1 1 0-15 7.5 7.5 0 0 1 0 15Z"
-                    stroke="rgba(15,23,42,.55)" stroke-width="1.8"/>
-              <path d="M16.2 16.2 21 21"
-                    stroke="rgba(15,23,42,.55)" stroke-width="1.8" stroke-linecap="round"/>
-            </svg>
-            <input id="assetInput" class="ui-input" placeholder="Scan or type asset number…" autocomplete="off" />
-          </div>
-
-          <button class="enter-btn" id="enterBtn" type="button" title="Send scan">
-            Send
-            <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
-              <path d="M4 12h13" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
-              <path d="M14 7l5 5-5 5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
-            </svg>
-          </button>
-        </div>
-
-        <div id="scanToast" class="toast" role="status" aria-live="polite">
-          <div class="icon" id="toastIcon" aria-hidden="true">…</div>
-          <div>
-            <div>
-              <strong>Movement</strong>
-              <span id="toastMeta">Ready</span>
-              <span class="ui-subtle"> · </span>
-              <span id="toastTime">10:42 AM</span>
-            </div>
-            <div class="ui-subtle" id="toastDetail">Scanner online</div>
-          </div>
-        </div>
-
-        <div class="ui-subtle" style="margin-top:8px;">
-          Enter = scan-out · Shift+Enter = scan-in (admin/demo)
-        </div>
-      </section>
-
-      <section class="ui-card">
-        <div class="ui-card-title">
-          <span>Last Scan</span>
-          <span class="ui-subtle">Live</span>
-        </div>
-
-        <div class="last-scan-banner" id="lastScanBanner">
-          <div class="checkmark" aria-hidden="true">✓</div>
-          <div style="flex:1;">
-            <div>
-              <strong id="lastScanLabel">Last scanned</strong>
-              <span class="ls-item" id="lastScanItem">Awaiting scan</span>
-            </div>
-            <div class="ui-subtle" style="margin-top:6px;">
-              <span id="lastScanAsset">—</span>
-              <span> · </span>
-              <span id="lastScanTime">—</span>
-              <span> · </span>
-              <span id="lastScanLoc">Dayton IPU</span>
-            </div>
-          </div>
-        </div>
-
-        <button class="undo-btn" id="undoBtn" style="margin-top: 10px;" disabled>Undo</button>
-      </section>
-
-      <section class="ui-card">
-        <div class="ui-card-title">
-          <span>Movement History</span>
-          <span class="ui-subtle">Session</span>
-        </div>
-
-        <button class="link-btn" id="historyBtn" type="button">
-          View recent movement history <span aria-hidden="true">›</span>
-        </button>
-      </section>
-
-      <footer>© OHI • Innovative Care Solutions — Internal use only</footer>
-    </div>
-
-    <div class="right">
-      <section class="ui-card signout-card">
-        <div class="signout-head">
-          <div>
-            <div class="signout-title">On-Hand Status</div>
-            <div class="signout-sub">Live totals from database</div>
-          </div>
-          <div class="ui-subtle" id="signoutLoc">Dayton IPU</div>
-        </div>
-
-        <div class="signout-list" id="signoutList"></div>
-      </section>
-    </div>
-  </div>
-</main>
-
-<script>
-/* ============================================================
-   CONFIG
-============================================================ */
-const REST_BASE = "https://sosyqdgeqgfuclffmzgl.supabase.co";
-const EDGE_URL = "https://sosyqdgeqgfuclffmzgl.supabase.co/functions/v1/asset-movement";
-const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNvc3lxZGdlcWdmdWNsZmZtemdsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Njk3ODA0MjgsImV4cCI6MjA4NTM1NjQyOH0.quknRUYbRqvLMpsCKjlytN38hek5sk1v1o6KJEwTCxQ";
-const TOTALS_TABLE = "ipu_item_totals";
-
-const CONTRACT = {
-  scanTypes: {
-    OUT: "scan_out",
-    IN: "scan_in",
-    VERIFY: "verify",
-  }
-};
-
-/* ============================================================
-   PAGE SETUP
-============================================================ */
-const qs = new URLSearchParams(location.search);
-const IPU_ID = Number(qs.get("ipu_id") || 1);
-const ipuName = qs.get("name") || "Dayton";
-
-document.getElementById("ipuTitle").textContent = `${ipuName} IPU`;
-document.getElementById("lastScanLoc").textContent = `${ipuName} IPU`;
-document.getElementById("signoutLoc").textContent = `${ipuName} IPU`;
-
-const adminBtn = document.getElementById("adminBtn");
-adminBtn.href = `admin.html?ipu_id=${encodeURIComponent(IPU_ID)}&name=${encodeURIComponent(ipuName)}`;
-
-/* ============================================================
-   ELEMENTS
-============================================================ */
-const assetInput = document.getElementById("assetInput");
-const enterBtn = document.getElementById("enterBtn");
-const signoutList = document.getElementById("signoutList");
-
-/* ============================================================
-   HELPERS
-============================================================ */
-function sbHeaders(extra = {}) {
-  return {
-    "apikey": SUPABASE_ANON_KEY,
-    "Authorization": `Bearer ${SUPABASE_ANON_KEY}`,
-    "Content-Type": "application/json",
-    "Accept": "application/json",
-    ...extra,
-  };
-}
-
-function escapeHtml(s){
-  return String(s ?? "")
-    .replaceAll("&","&amp;")
-    .replaceAll("<","&lt;")
-    .replaceAll(">","&gt;")
-    .replaceAll('"',"&quot;")
-    .replaceAll("'","&#039;");
-}
-
-function nowTime(){
-  return new Date().toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' });
-}
-
-function statusType(onHand, par){
-  if (Number(onHand) === 0) return "bad";
-  if (Number(onHand) >= Number(par)) return "ok";
-  return "warn";
-}
-
-function dotSVG(type){
-  if(type === "ok"){
-    return `<span class="dot ok" aria-hidden="true">
-      <svg viewBox="0 0 24 24" fill="none">
-        <path d="M6.5 12.5 10.2 16.2 17.5 8.9" stroke-linecap="round" stroke-linejoin="round"/>
-      </svg>
-    </span>`;
-  }
-  if(type === "warn"){
-    return `<span class="dot warn" aria-hidden="true">
-      <svg viewBox="0 0 24 24" fill="none">
-        <path d="M12 6v7" stroke-linecap="round"/>
-        <path d="M12 17.5h.01" stroke-linecap="round"/>
-      </svg>
-    </span>`;
-  }
-  return `<span class="dot bad" aria-hidden="true">
-    <svg viewBox="0 0 24 24" fill="none">
-      <path d="M8 8l8 8" stroke-linecap="round"/>
-      <path d="M16 8l-8 8" stroke-linecap="round"/>
-    </svg>
-  </span>`;
-}
-
-/* ============================================================
-   TOAST
-============================================================ */
-let toastTimer = null;
-
-function setToastState(state){
-  const toast = document.getElementById("scanToast");
-  toast.classList.remove("pending","success","warn","error");
-  toast.classList.add(state);
-}
-
-function setToastIcon(char){
-  document.getElementById("toastIcon").textContent = char;
-}
-
-function showToast({state, icon, meta, detail}){
-  const toast = document.getElementById("scanToast");
-
-  setToastState(state);
-  setToastIcon(icon);
-
-  document.getElementById("toastMeta").textContent = meta;
-  document.getElementById("toastDetail").textContent = detail;
-  document.getElementById("toastTime").textContent = nowTime();
-
-  toast.classList.remove("show","hide");
-  void toast.offsetWidth;
-  toast.classList.add("show");
-
-  clearTimeout(toastTimer);
-  toastTimer = setTimeout(() => {
-    toast.classList.remove("show");
-    toast.classList.add("hide");
-  }, 4200);
-}
-
-/* ============================================================
-   STATE
-============================================================ */
-let TRACKED_ITEMS = [];
-let movements = [];
-let lastAction = null;
-
-/* ============================================================
-   LAST SCAN / SESSION LOG
-============================================================ */
-function logMovement(entry){
-  movements.unshift(entry);
-  movements = movements.slice(0, 50);
-}
-
-function setLastScan({ label, item_name, asset_number, source, action }){
-  document.getElementById("lastScanLabel").textContent = label;
-  document.getElementById("lastScanItem").textContent = item_name || "Item";
-  document.getElementById("lastScanAsset").textContent = asset_number || (source === "manual" ? "Manual" : "ICS-??????");
-  document.getElementById("lastScanTime").textContent = nowTime();
-  document.getElementById("lastScanLoc").textContent = `${ipuName} IPU`;
-
-  document.getElementById("undoBtn").disabled = false;
-  lastAction = { source, action, item_name, asset_number };
-}
-
-/* ============================================================
-   LIVE TOTALS LOAD
-============================================================ */
-async function loadTotals() {
-  const url =
-    `${REST_BASE}/rest/v1/${TOTALS_TABLE}` +
-    `?select=item_id,total_quantity,par_quantity,items(name)` +
-    `&ipu_id=eq.${IPU_ID}` +
-    `&order=item_id.asc`;
-
-  const res = await fetch(url, {
-    headers: {
-      apikey: SUPABASE_ANON_KEY,
-      Authorization: `Bearer ${SUPABASE_ANON_KEY}`,
-      Accept: "application/json",
-    },
-  });
-
-  if (!res.ok) {
-    const text = await res.text();
-    throw new Error(text || "Could not load totals");
-  }
-
-  const data = await res.json();
-
-  TRACKED_ITEMS = data.map(r => ({
-    item_id: Number(r.item_id),
-    item: r.items?.name ?? `Item ${r.item_id}`,
-    onHand: Number(r.total_quantity ?? 0),
-    par: Number(r.par_quantity ?? 0),
-  })).sort((a, b) => (a.item || "").localeCompare(b.item || ""));
-  renderSignOut();
-}
-
-/* ============================================================
-   RENDER LIVE RIGHT LIST
-============================================================ */
-function renderSignOut(){
-  signoutList.innerHTML = "";
-
-  if (!TRACKED_ITEMS.length) {
-    signoutList.innerHTML = `
-      <div class="empty-state">
-        No tracked totals found for this IPU.
-      </div>
-    `;
-    return;
-  }
-
-  for (let i = 0; i < TRACKED_ITEMS.length; i++){
-    const row = TRACKED_ITEMS[i];
-    const st = statusType(row.onHand, row.par);
-
-    const div = document.createElement("div");
-    div.className = "signout-row";
-    div.innerHTML = `
-      <div class="itemcell">
-        ${dotSVG(st)}
-        <span class="itemname" title="${escapeHtml(row.item)}">${escapeHtml(row.item)}</span>
-      </div>
-      <span class="pill ${st}">${row.onHand} / ${row.par}</span>
-      <button class="take1" type="button" data-idx="${i}" ${row.onHand === 0 ? "disabled" : ""}>
-        Take 1 <small aria-hidden="true">›</small>
-      </button>
-    `;
-    signoutList.appendChild(div);
-  }
-
-  signoutList.querySelectorAll(".take1[data-idx]").forEach(btn => {
-    btn.addEventListener("click", async () => {
-      const idx = Number(btn.getAttribute("data-idx"));
-      await manualTakeOne(idx);
-    });
-  });
-}
-
-/* ============================================================
-   LIVE MANUAL TAKE 1
-============================================================ */
-async function updateSingleTotal(item_id, total_quantity, par_quantity){
-  const res = await fetch(
-    `${REST_BASE}/rest/v1/${TOTALS_TABLE}?ipu_id=eq.${IPU_ID}&item_id=eq.${item_id}`,
-    {
-      method: "PATCH",
-      headers: sbHeaders({ "Prefer": "return=representation" }),
-      body: JSON.stringify({
-        total_quantity: Number(total_quantity),
-        par_quantity: Number(par_quantity)
-      })
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>IPU Inventory</title>
+
+  <style>
+    :root{
+      --bg-top:#ffffff;
+      --bg-bottom:#f4f6f9;
+
+      --ink:#404040;
+      --ink-soft:#5b5b5b;
+      --muted:#7a7a7a;
+      --muted-2:#919191;
+
+      --teal-rgb:20,137,168;
+      --orange-rgb:243,112,33;
+
+      --card-bg:rgba(255,255,255,.95);
+      --card-border:rgba(243,112,33,.35);
+      --card-border-hover:rgba(20,137,168,.60);
+
+      --shadow-sm:0 8px 20px rgba(0,0,0,.06);
+      --shadow-md:0 14px 30px rgba(0,0,0,.10);
+      --shadow-lg:0 24px 60px rgba(0,0,0,.18);
+
+      --radius-lg:22px;
+      --radius-md:16px;
+      --radius-sm:12px;
+
+      --action:#3e8fa3;
+      --action-hover:#327e90;
+      --action-ring:rgba(62,143,163,.24);
+
+      --surface:rgba(255,255,255,.82);
+      --line:rgba(0,0,0,.07);
+      --line-soft:rgba(0,0,0,.05);
+      --success-bg:rgba(20,137,168,.10);
+      --success-border:rgba(20,137,168,.18);
+      --success-ink:#0e6b82;
+      --need-bg:rgba(243,112,33,.11);
+      --need-border:rgba(243,112,33,.18);
+      --need-ink:#a14b13;
     }
-  );
 
-  if (!res.ok) {
-    const text = await res.text();
-    throw new Error(text || "Failed to update total");
-  }
+    *{ box-sizing:border-box; }
+    html,body{ height:100%; }
 
-  return await res.json();
-}
-
-async function manualTakeOne(idx){
-  const row = TRACKED_ITEMS[idx];
-  if(!row || row.onHand === 0) return;
-
-  const originalOnHand = row.onHand;
-  row.onHand = Math.max(0, row.onHand - 1);
-  renderSignOut();
-
-  try {
-    showToast({ state:"pending", icon:"…", meta:"Manual · Take 1", detail: row.item });
-
-    await updateSingleTotal(row.item_id, row.onHand, row.par);
-
-    logMovement({
-      ts: new Date().toISOString(),
-      time: nowTime(),
-      source: "manual",
-      action: "take_1",
-      item_name: row.item,
-      asset_number: "Manual",
-      ipu: `${ipuName} IPU`,
-    });
-
-    showToast({ state:"success", icon:"✓", meta:"Manual · Take 1", detail: row.item });
-    setLastScan({
-      label: "Last action",
-      item_name: row.item,
-      asset_number: "Manual",
-      source: "manual",
-      action: "take_1"
-    });
-
-    await loadTotals();
-  } catch (err) {
-    row.onHand = originalOnHand;
-    renderSignOut();
-    console.error(err);
-    showToast({ state:"error", icon:"✕", meta:"Manual · Take 1", detail: String(err).slice(0, 180) });
-  }
-}
-
-/* ============================================================
-   EDGE FUNCTION CALL
-============================================================ */
-async function sendScan(asset_number, ipu_id, scan_type) {
-  const res = await fetch(EDGE_URL, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      "Authorization": "Bearer " + SUPABASE_ANON_KEY,
-      "apikey": SUPABASE_ANON_KEY
-    },
-    body: JSON.stringify({ asset_number, ipu_id, scan_type })
-  });
-
-  let data = null;
-  try {
-    data = await res.json();
-  } catch {
-    data = { status: "bad_json", message: "Edge returned non-JSON" };
-  }
-
-  if (!res.ok) {
-    return {
-      status: data?.status || "http_error",
-      message: data?.message || data?.error || `HTTP ${res.status}`,
-      raw: data
-    };
-  }
-
-  return data;
-}
-
-/* ============================================================
-   RESULT → TOAST
-============================================================ */
-function toastForResult(scan_type, asset, result){
-  const actionLabel = (scan_type === CONTRACT.scanTypes.OUT) ? "Out" : "In";
-
-  if (result?.status === "success" && result?.notice === "already_on_hand") {
-    return {
-      state:"warn",
-      icon:"!",
-      meta:`Scan · ${actionLabel}`,
-      detail:`${asset} already on hand`
-    };
-  }
-
-  if (result?.status === "success") {
-    return {
-      state:"success",
-      icon:"✓",
-      meta:`Scan · ${actionLabel}`,
-      detail: asset
-    };
-  }
-
-  if (result?.status === "already_on_hand") {
-    return {
-      state:"warn",
-      icon:"!",
-      meta:`Scan · ${actionLabel}`,
-      detail:"Already on hand"
-    };
-  }
-
-  if (result?.status === "unknown_asset") {
-    return {
-      state:"error",
-      icon:"✕",
-      meta:`Scan · ${actionLabel}`,
-      detail:"Unknown asset"
-    };
-  }
-
-  if (result?.status === "missing_fields") {
-    return {
-      state:"error",
-      icon:"✕",
-      meta:`Scan · ${actionLabel}`,
-      detail:"Missing fields"
-    };
-  }
-
-  if (result?.status === "invalid_scan_type") {
-    return {
-      state:"error",
-      icon:"✕",
-      meta:`Scan · ${actionLabel}`,
-      detail:"Invalid scan type"
-    };
-  }
-
-  if (result?.status === "http_error" || result?.status === "bad_json") {
-    return {
-      state:"error",
-      icon:"✕",
-      meta:`Scan · ${actionLabel}`,
-      detail: result.message || result.status
-    };
-  }
-
-  return {
-    state:"error",
-    icon:"✕",
-    meta:`Scan · ${actionLabel}`,
-    detail: result?.status || "Error"
-  };
-}
-
-/* ============================================================
-   SCAN FLOW
-============================================================ */
-async function runScan(scan_type){
-  const asset = assetInput.value.trim().toUpperCase();
-  if (!asset) return;
-
-  showToast({
-    state: "pending",
-    icon: "…",
-    meta: "Sending · " + (scan_type === CONTRACT.scanTypes.OUT ? "Out" : "In"),
-    detail: asset
-  });
-
-  enterBtn.disabled = true;
-  assetInput.disabled = true;
-
-  let result;
-  try {
-    result = await sendScan(asset, IPU_ID, scan_type);
-  } catch (err) {
-    console.error("Network error:", err);
-    showToast({ state:"error", icon:"✕", meta:"Scan · Network Error", detail: String(err).slice(0, 180) });
-    enterBtn.disabled = false;
-    assetInput.disabled = false;
-    assetInput.focus();
-    return;
-  }
-
-  const t = toastForResult(scan_type, asset, result);
-  showToast(t);
-
-  if (result?.status === "success" || result?.status === "already_on_hand") {
-    setLastScan({
-      label: "Last scanned",
-      item_name: result.item_name || (result?.notice === "already_on_hand" ? "Already on hand" : "Asset moved"),
-      asset_number: asset,
-      source: "scan",
-      action: scan_type
-    });
-
-    logMovement({
-      ts: new Date().toISOString(),
-      time: nowTime(),
-      source: "scan",
-      action: scan_type,
-      item_name: result.item_name || "Asset moved",
-      asset_number: asset,
-      ipu: `${ipuName} IPU`,
-      status: result.status,
-      notice: result.notice || null
-    });
-
-    try {
-      await loadTotals();
-    } catch (err) {
-      console.error(err);
-      showToast({
-        state:"error",
-        icon:"✕",
-        meta:"Refresh failed",
-        detail:String(err).slice(0, 180)
-      });
+    body{
+      margin:0;
+      font-family:system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+      color:var(--ink);
+      background:
+        linear-gradient(
+          to bottom,
+          var(--bg-top) 0%,
+          var(--bg-top) 300px,
+          var(--bg-bottom) 300px,
+          var(--bg-bottom) 100%
+        );
     }
-  } else {
-    logMovement({
-      ts: new Date().toISOString(),
-      time: nowTime(),
-      source: "scan",
-      action: scan_type,
-      item_name: "ERROR",
-      asset_number: asset,
-      ipu: `${ipuName} IPU`,
-      status: result?.status || "error"
-    });
-  }
 
-  assetInput.value = "";
-  enterBtn.disabled = false;
-  assetInput.disabled = false;
-  assetInput.focus();
-}
+    img{ display:block; max-width:100%; }
 
-/* ============================================================
-   INPUT EVENTS
-============================================================ */
-assetInput.addEventListener("keydown", async (e) => {
-  if (e.key !== "Enter") return;
-  e.preventDefault();
-  const scan_type = e.shiftKey ? CONTRACT.scanTypes.IN : CONTRACT.scanTypes.OUT;
-  await runScan(scan_type);
-});
+    button{
+      font:inherit;
+    }
 
-enterBtn.addEventListener("click", async () => {
-  await runScan(CONTRACT.scanTypes.OUT);
-});
+    /* =========================
+       HEADER
+    ========================= */
+    header{
+      position:relative;
+      overflow:hidden;
+      text-align:center;
+      padding:68px 20px 30px;
+    }
 
-/* ============================================================
-   UNDO
-============================================================ */
-async function doUndo(){
-  if (!lastAction) {
-    showToast({ state:"warn", icon:"!", meta:"Undo", detail:"Nothing to undo" });
-    return;
-  }
+    .header-sheen{
+      position:absolute;
+      top:40px;
+      left:50%;
+      transform:translateX(-50%);
+      width:min(760px,92vw);
+      height:140px;
+      z-index:1;
+      pointer-events:none;
+      background:
+        radial-gradient(
+          320px 110px at 50% 45%,
+          rgba(255,255,255,.94),
+          rgba(255,255,255,.58) 56%,
+          rgba(255,255,255,0) 78%
+        );
+    }
 
-  // UNDO LAST SCAN
-  if (lastAction.source === "scan") {
-    showToast({ state:"pending", icon:"…", meta:"Undo", detail:lastAction.asset_number });
+    .header-title,
+    .header-sub,
+    .header-tagline{
+      position:relative;
+      z-index:2;
+    }
 
-    try {
-      const res = await fetch(EDGE_URL, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          "Authorization": "Bearer " + SUPABASE_ANON_KEY,
-          "apikey": SUPABASE_ANON_KEY
-        },
-        body: JSON.stringify({
-          asset_number: lastAction.asset_number,
-          ipu_id: IPU_ID,
-          scan_type: "undo",
-          undo_target: lastAction.action
-        })
-      });
+    .header-title{
+      font-size:26px;
+      font-weight:780;
+      letter-spacing:.8px;
+      color:var(--ink);
+    }
 
-      const data = await res.json();
+    .header-sub{
+      margin-top:6px;
+      font-size:13px;
+      letter-spacing:1.6px;
+      text-transform:uppercase;
+      color:var(--muted);
+    }
 
-      if (!res.ok) {
-        showToast({
-          state:"error",
-          icon:"✕",
-          meta:"Undo failed",
-          detail:data?.message || data?.error || `HTTP ${res.status}`
-        });
-        return;
+    .header-tagline{
+      margin-top:14px;
+      font-size:13px;
+      letter-spacing:.35px;
+      color:var(--muted-2);
+    }
+
+    .wave-layer{
+      position:absolute;
+      left:0;
+      bottom:70px;
+      width:100%;
+      height:170px;
+      z-index:0;
+      pointer-events:none;
+    }
+
+    .wave-layer svg{
+      position:absolute;
+      inset:0;
+      left:-10%;
+      width:120%;
+      height:100%;
+      opacity:.42;
+      display:block;
+    }
+
+    .wave-top{ transform:translateY(-10px); }
+    .wave-mid{ transform:translateY(2px); }
+    .wave-low{ transform:translateY(12px); }
+
+    /* =========================
+       MAIN
+    ========================= */
+    main{
+      max-width:1120px;
+      margin:0 auto;
+      padding:18px 14px 56px;
+      text-align:center;
+    }
+
+    .select-row{
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      gap:12px;
+      flex-wrap:wrap;
+      margin-bottom:10px;
+    }
+
+    h2{
+      margin:0;
+      font-size:26px;
+      font-weight:620;
+      letter-spacing:.4px;
+      color:var(--ink-soft);
+    }
+
+    .brand-badge{
+      width:34px;
+      height:34px;
+      border-radius:12px;
+      flex:0 0 auto;
+      display:grid;
+      place-items:center;
+      background:
+        radial-gradient(16px 16px at 30% 30%, rgba(var(--orange-rgb),.45), transparent 62%),
+        radial-gradient(18px 18px at 70% 60%, rgba(var(--teal-rgb),.38), transparent 64%),
+        rgba(255,255,255,.78);
+      border:1px solid rgba(0,0,0,.06);
+      box-shadow:0 10px 18px rgba(0,0,0,.06);
+    }
+
+    .brand-badge svg{
+      width:18px;
+      height:18px;
+    }
+
+    .section-sub{
+      margin-top:-4px;
+      margin-bottom:24px;
+      font-size:14px;
+      color:var(--muted);
+    }
+
+    .section-actions{
+      display:flex;
+      justify-content:center;
+      margin-bottom:42px;
+    }
+
+    /* =========================
+       BUTTONS
+    ========================= */
+    .btn-primary{
+      border:0;
+      cursor:pointer;
+      color:#fff;
+      background:var(--action);
+      border-radius:999px;
+      padding:14px 26px;
+      font-size:14px;
+      font-weight:800;
+      letter-spacing:.28px;
+      box-shadow:
+        0 10px 26px rgba(0,0,0,.14),
+        inset 0 1px 0 rgba(255,255,255,.20);
+      transition:
+        transform .18s ease,
+        background .18s ease,
+        box-shadow .18s ease;
+    }
+
+    .btn-primary:hover{
+      transform:translateY(-2px);
+      background:var(--action-hover);
+      box-shadow:
+        0 14px 30px rgba(0,0,0,.17),
+        inset 0 1px 0 rgba(255,255,255,.20);
+    }
+
+    .btn-primary:active{
+      transform:translateY(0);
+      box-shadow:0 6px 14px rgba(0,0,0,.14);
+    }
+
+    .btn-primary:focus-visible,
+    .btn-secondary:focus-visible,
+    .icon-btn:focus-visible,
+    .ipu-card:focus-visible{
+      outline:none;
+      box-shadow:
+        0 0 0 4px var(--action-ring),
+        0 12px 28px rgba(0,0,0,.12);
+    }
+
+    .btn-secondary{
+      border:0;
+      cursor:pointer;
+      border-radius:14px;
+      padding:12px 18px;
+      font-size:13px;
+      font-weight:700;
+      color:#4f5b68;
+      background:rgba(0,0,0,.06);
+      transition:
+        transform .16s ease,
+        background .16s ease,
+        box-shadow .16s ease;
+    }
+
+    .btn-secondary:hover{
+      transform:translateY(-1px);
+      background:rgba(0,0,0,.10);
+    }
+
+    /* =========================
+       LANDING CARDS
+    ========================= */
+    .ipu-grid{
+      display:grid;
+      grid-template-columns:repeat(auto-fit, minmax(220px, 270px));
+      justify-content:center;
+      gap:46px;
+      padding:0 6px;
+    }
+
+    .ipu-card{
+      position:relative;
+      display:block;
+      text-decoration:none;
+      color:inherit;
+      background:var(--card-bg);
+      border:3px solid var(--card-border);
+      border-radius:var(--radius-lg);
+      padding:26px 18px 22px;
+      box-shadow:var(--shadow-sm);
+      transition:
+        transform .18s ease,
+        box-shadow .18s ease,
+        border-color .18s ease,
+        opacity .18s ease;
+      opacity:.96;
+    }
+
+    .ipu-card::before{
+      content:"";
+      position:absolute;
+      inset:10px;
+      border-radius:calc(var(--radius-lg) - 8px);
+      pointer-events:none;
+      background:
+        radial-gradient(70px 70px at 18% 20%, rgba(var(--orange-rgb),.16), transparent 65%),
+        radial-gradient(90px 90px at 78% 62%, rgba(var(--teal-rgb),.14), transparent 70%);
+    }
+
+    .ipu-card:hover{
+      transform:translateY(-4px);
+      border-color:var(--card-border-hover);
+      box-shadow:var(--shadow-md);
+      opacity:1;
+    }
+
+    .ipu-icon{
+      position:relative;
+      z-index:1;
+      width:102px;
+      height:102px;
+      margin:0 auto 14px;
+      border-radius:26px;
+      display:grid;
+      place-items:center;
+      background:#fff;
+      border:1px solid rgba(0,0,0,.06);
+      box-shadow:0 10px 18px rgba(0,0,0,.05);
+    }
+
+    .ipu-icon img{
+      width:74px;
+      height:74px;
+      object-fit:contain;
+    }
+
+    .ipu-title{
+      position:relative;
+      z-index:1;
+      font-size:22px;
+      font-weight:620;
+      color:var(--ink-soft);
+    }
+
+    /* =========================
+       MODAL
+    ========================= */
+    .modal{
+      position:fixed;
+      inset:0;
+      z-index:9999;
+      display:none;
+      align-items:center;
+      justify-content:center;
+      padding:24px;
+      background:rgba(15,23,42,.34);
+      backdrop-filter:blur(7px);
+      -webkit-backdrop-filter:blur(7px);
+    }
+
+    .modal.show{
+      display:flex;
+    }
+
+    .modal-shell{
+      position:relative;
+      width:min(1180px, 100%);
+      max-height:92vh;
+      overflow:auto;
+      border-radius:28px;
+      background:
+        linear-gradient(
+          180deg,
+          rgba(255,255,255,.97),
+          rgba(247,249,251,.98)
+        );
+      border:1px solid rgba(255,255,255,.65);
+      box-shadow:
+        0 30px 80px rgba(0,0,0,.18),
+        inset 0 1px 0 rgba(255,255,255,.65);
+    }
+
+    .modal-shell::before{
+      content:"";
+      position:absolute;
+      inset:0;
+      border-radius:28px;
+      pointer-events:none;
+      background:
+        radial-gradient(240px 120px at 12% 10%, rgba(var(--orange-rgb),.10), transparent 60%),
+        radial-gradient(260px 140px at 88% 10%, rgba(var(--teal-rgb),.10), transparent 60%);
+    }
+
+    .modal-head{
+      position:sticky;
+      top:0;
+      z-index:5;
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:16px;
+      padding:22px 24px 18px;
+      background:linear-gradient(180deg, rgba(255,255,255,.90), rgba(255,255,255,.74));
+      border-bottom:1px solid var(--line);
+      backdrop-filter:blur(8px);
+      border-top-left-radius:28px;
+      border-top-right-radius:28px;
+    }
+
+    .modal-head-left{
+      text-align:left;
+    }
+
+    .modal-title{
+      font-size:22px;
+      font-weight:800;
+      letter-spacing:.2px;
+      color:#374151;
+    }
+
+    .modal-sub{
+      margin-top:4px;
+      font-size:13px;
+      color:#6b7280;
+    }
+
+    .icon-btn{
+      border:0;
+      width:42px;
+      height:42px;
+      border-radius:14px;
+      cursor:pointer;
+      font-size:24px;
+      line-height:1;
+      color:#5a6572;
+      background:rgba(0,0,0,.05);
+      transition:
+        transform .16s ease,
+        background .16s ease;
+    }
+
+    .icon-btn:hover{
+      transform:translateY(-1px);
+      background:rgba(0,0,0,.08);
+    }
+
+    .modal-body{
+      position:relative;
+      padding:24px;
+    }
+
+    .peek-grid{
+      display:grid;
+      grid-template-columns:repeat(auto-fit, minmax(280px, 1fr));
+      gap:18px;
+    }
+
+    /* =========================
+       QUICK PEEK CARDS
+    ========================= */
+    .peek-card{
+      position:relative;
+      overflow:hidden;
+      border-radius:24px;
+      background:
+        linear-gradient(
+          180deg,
+          rgba(255,255,255,.99),
+          rgba(250,251,252,.98)
+        );
+      border:1px solid var(--line);
+      box-shadow:
+        0 18px 32px rgba(15,23,42,.09),
+        inset 0 1px 0 rgba(255,255,255,.90);
+    }
+
+    .peek-card::before{
+      content:"";
+      position:absolute;
+      inset:0;
+      pointer-events:none;
+      background:
+        radial-gradient(140px 90px at 15% 10%, rgba(var(--orange-rgb),.14), transparent 65%),
+        radial-gradient(160px 100px at 85% 18%, rgba(var(--teal-rgb),.16), transparent 68%);
+    }
+
+    .peek-card-top,
+    .peek-card-mid,
+    .peek-card-foot{
+      position:relative;
+      z-index:1;
+    }
+
+    .peek-card-top{
+      padding:18px 18px 14px;
+      border-bottom:1px solid var(--line);
+      background:
+        linear-gradient(
+          135deg,
+          rgba(var(--orange-rgb),.07),
+          rgba(var(--teal-rgb),.08)
+        );
+    }
+
+    .peek-ticket{
+      display:inline-flex;
+      align-items:center;
+      gap:8px;
+      padding:6px 10px;
+      border-radius:999px;
+      background:rgba(255,255,255,.76);
+      border:1px solid rgba(255,255,255,.74);
+      box-shadow:0 6px 12px rgba(0,0,0,.05);
+      font-size:11px;
+      font-weight:800;
+      letter-spacing:.7px;
+      text-transform:uppercase;
+      color:#5d6773;
+    }
+
+    .peek-name{
+      margin-top:12px;
+      font-size:23px;
+      line-height:1.1;
+      font-weight:800;
+      color:#344256;
+    }
+
+    .peek-address{
+      margin-top:8px;
+      min-height:38px;
+      font-size:13px;
+      line-height:1.45;
+      color:#677383;
+    }
+
+    .peek-stats{
+      display:flex;
+      flex-wrap:wrap;
+      gap:8px;
+      margin-top:14px;
+    }
+
+    .peek-pill{
+      padding:8px 10px;
+      border-radius:999px;
+      font-size:12px;
+      font-weight:700;
+      letter-spacing:.2px;
+      border:1px solid var(--line);
+      background:rgba(255,255,255,.76);
+      color:#4b5563;
+    }
+
+    .peek-pill.need{
+      background:var(--need-bg);
+      border-color:var(--need-border);
+      color:var(--need-ink);
+    }
+
+    .peek-pill.stocked{
+      background:var(--success-bg);
+      border-color:var(--success-border);
+      color:var(--success-ink);
+    }
+
+    .peek-card-mid{
+      padding:16px 18px 6px;
+    }
+
+    .peek-section-label{
+      margin-bottom:12px;
+      font-size:12px;
+      font-weight:800;
+      letter-spacing:.7px;
+      text-transform:uppercase;
+      color:#7b8794;
+    }
+
+    .peek-list{
+      list-style:none;
+      margin:0;
+      padding:0;
+      display:grid;
+      gap:10px;
+    }
+
+    .peek-item{
+      display:flex;
+      align-items:flex-start;
+      justify-content:space-between;
+      gap:12px;
+      padding:12px;
+      border-radius:16px;
+      background:rgba(255,255,255,.84);
+      border:1px solid var(--line-soft);
+      box-shadow:0 4px 10px rgba(15,23,42,.04);
+    }
+
+    .peek-item-name{
+      flex:1;
+      text-align:left;
+      font-size:14px;
+      line-height:1.35;
+      font-weight:700;
+      color:#435467;
+    }
+
+    .peek-item-qty{
+      flex:0 0 auto;
+      min-width:44px;
+      text-align:center;
+      padding:6px 10px;
+      border-radius:999px;
+      font-size:13px;
+      font-weight:800;
+      background:var(--need-bg);
+      border:1px solid var(--need-border);
+      color:var(--need-ink);
+    }
+
+    .peek-empty{
+      padding:16px;
+      text-align:center;
+      font-weight:700;
+      color:var(--success-ink);
+      background:var(--success-bg);
+      border:1px solid var(--success-border);
+      border-radius:16px;
+    }
+
+    .peek-card-foot{
+      display:flex;
+      flex-wrap:wrap;
+      gap:10px;
+      padding:16px 18px 18px;
+    }
+
+    .peek-note{
+      width:100%;
+      margin-top:2px;
+      font-size:11px;
+      color:#8a94a3;
+      text-align:left;
+    }
+
+    /* off-screen capture stage */
+    .capture-stage{
+      position:fixed;
+      left:-100000px;
+      top:0;
+      z-index:-1;
+      pointer-events:none;
+      opacity:1;
+      background:transparent;
+      padding:0;
+      margin:0;
+    }
+
+    .capture-card-wrap{
+      width:auto;
+      display:block;
+    }
+
+    .peek-card.capture-mode,
+    .peek-card.capture-mode:hover,
+    .peek-card.capture-mode:focus,
+    .peek-card.capture-mode:active{
+      transform:none !important;
+      opacity:1 !important;
+      filter:none !important;
+    }
+
+    .peek-card.capture-mode .peek-card-foot{
+      display:none !important;
+    }
+
+    /* =========================
+       TOAST
+    ========================= */
+    .toast{
+      position:fixed;
+      left:50%;
+      bottom:22px;
+      z-index:10001;
+      transform:translateX(-50%) translateY(16px);
+      opacity:0;
+      pointer-events:none;
+      min-width:220px;
+      max-width:88vw;
+      padding:12px 16px;
+      border-radius:16px;
+      color:#fff;
+      font-size:14px;
+      font-weight:800;
+      letter-spacing:.2px;
+      background:var(--action);
+      box-shadow:0 18px 34px rgba(15,23,42,.18);
+      transition:
+        opacity .24s ease,
+        transform .24s ease;
+    }
+
+    .toast.show{
+      opacity:1;
+      transform:translateX(-50%) translateY(0);
+    }
+
+    /* =========================
+       FOOTER
+    ========================= */
+    footer{
+      text-align:center;
+      padding:10px 16px 28px;
+      color:rgba(0,0,0,.38);
+      font-size:12px;
+      letter-spacing:.2px;
+    }
+
+    /* =========================
+       RESPONSIVE
+    ========================= */
+    @media (max-width: 520px){
+      body{
+        background:
+          linear-gradient(
+            to bottom,
+            var(--bg-top) 0%,
+            var(--bg-top) 316px,
+            var(--bg-bottom) 316px,
+            var(--bg-bottom) 100%
+          );
       }
 
-      showToast({
-        state:"success",
-        icon:"↺",
-        meta:"Undo complete",
-        detail:data.item_name || lastAction.asset_number
-      });
+      header{
+        padding:56px 16px 24px;
+      }
 
-      lastAction = null;
-      document.getElementById("undoBtn").disabled = true;
-      await loadTotals();
-      return;
-    } catch (err) {
-      showToast({
-        state:"error",
-        icon:"✕",
-        meta:"Undo failed",
-        detail:String(err).slice(0, 180)
-      });
-      return;
+      .header-title{
+        font-size:20px;
+        letter-spacing:.6px;
+      }
+
+      .wave-layer{
+        bottom:78px;
+        height:150px;
+      }
+
+      .section-sub{
+        margin-bottom:18px;
+      }
+
+      .ipu-grid{
+        gap:22px;
+      }
+
+      .modal{
+        padding:14px;
+      }
+
+      .modal-head{
+        padding:18px 16px 14px;
+      }
+
+      .modal-title{
+        font-size:18px;
+      }
+
+      .modal-body{
+        padding:16px;
+      }
+
+      .btn-primary{
+        padding:13px 22px;
+      }
     }
+
+    @media (prefers-reduced-motion: reduce){
+      *,
+      *::before,
+      *::after{
+        scroll-behavior:auto !important;
+      }
+
+      .btn-primary,
+      .btn-secondary,
+      .icon-btn,
+      .ipu-card,
+      .toast{
+        transition:none;
+      }
+
+      .btn-primary:hover,
+      .btn-secondary:hover,
+      .icon-btn:hover,
+      .ipu-card:hover{
+        transform:none;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <div class="header-sheen"></div>
+
+    <div class="header-title">OHI • Innovative Care Solutions</div>
+    <div class="header-sub">Inventory Portal</div>
+    <div class="header-tagline">Select a unit to view par levels &amp; scan tools</div>
+
+    <div class="wave-layer" aria-hidden="true">
+      <svg class="wave-top" viewBox="0 0 1200 220" preserveAspectRatio="none">
+        <path d="M0,120
+                 C70,10 140,210 210,120
+                 C280,30 350,220 420,120
+                 C490,10 560,210 630,120
+                 C700,30 770,220 840,120
+                 C910,10 980,210 1050,120
+                 C1120,30 1160,180 1200,120"
+              fill="none"
+              stroke="rgba(var(--orange-rgb),0.60)"
+              stroke-width="22"
+              stroke-linecap="round" />
+        <path d="M0,150
+                 C90,40 180,240 270,150
+                 C360,60 450,250 540,150
+                 C630,40 720,240 810,150
+                 C900,60 990,250 1080,150
+                 C1140,120 1170,95 1200,80"
+              fill="none"
+              stroke="rgba(var(--orange-rgb),0.30)"
+              stroke-width="10"
+              stroke-linecap="round" />
+      </svg>
+
+      <svg class="wave-mid" viewBox="0 0 1200 220" preserveAspectRatio="none">
+        <path d="M0,105
+                 C80,210 160,0 240,105
+                 C320,210 400,0 480,105
+                 C560,210 640,0 720,105
+                 C800,210 880,0 960,105
+                 C1040,210 1120,0 1200,105"
+              fill="none"
+              stroke="rgba(var(--teal-rgb),0.58)"
+              stroke-width="12"
+              stroke-linecap="round" />
+        <path d="M0,135
+                 C90,240 180,30 270,135
+                 C360,240 450,30 540,135
+                 C630,240 720,30 810,135
+                 C900,240 990,30 1080,135
+                 C1140,175 1170,155 1200,145"
+              fill="none"
+              stroke="rgba(var(--teal-rgb),0.32)"
+              stroke-width="6"
+              stroke-linecap="round" />
+        <path d="M0,92
+                 C90,170 180,10 270,92
+                 C360,170 450,10 540,92
+                 C630,170 720,10 810,92
+                 C900,170 990,10 1080,92
+                 C1140,140 1170,125 1200,110"
+              fill="none"
+              stroke="rgba(var(--teal-rgb),0.18)"
+              stroke-width="3"
+              stroke-linecap="round" />
+      </svg>
+
+      <svg class="wave-low" viewBox="0 0 1200 360" preserveAspectRatio="none">
+        <path d="M0,170
+                 C120,300 240,40 360,160
+                 C480,280 600,60 720,180
+                 C840,300 960,40 1080,160
+                 C1140,220 1170,255 1200,280
+                 L1200,360 L0,360 Z"
+              fill="rgba(var(--teal-rgb),0.10)" />
+        <path d="M0,210
+                 C150,340 300,90 450,200
+                 C600,320 750,110 900,220
+                 C1050,340 1120,250 1200,280
+                 L1200,360 L0,360 Z"
+              fill="rgba(var(--orange-rgb),0.08)" />
+      </svg>
+    </div>
+  </header>
+
+  <main>
+    <div class="select-row">
+      <div class="brand-badge" aria-hidden="true">
+        <svg viewBox="0 0 24 24" fill="none">
+          <path d="M18.5 5.5c-6.2.7-10.7 5.2-11.4 11.4 6.2-.7 10.7-5.2 11.4-11.4Z"
+                stroke="rgba(90,192,170,.95)"
+                stroke-width="1.6"
+                stroke-linejoin="round"/>
+          <path d="M7 17c2.4-1 5.2-3.6 6.9-6.8"
+                stroke="rgba(243,179,106,.95)"
+                stroke-width="1.6"
+                stroke-linecap="round"/>
+        </svg>
+      </div>
+      <h2>Select an IPU</h2>
+    </div>
+
+    <div class="section-sub">Choose your inpatient unit below</div>
+
+    <div class="section-actions">
+      <button id="quickPeekBtn" class="btn-primary" type="button">Quick Peek</button>
+    </div>
+
+    <div class="ipu-grid">
+      <a class="ipu-card" href="ipu.html?ipu_id=1&name=Dayton" aria-label="Open Dayton IPU">
+        <div class="ipu-icon">
+          <img src="zz.ICS_true_logo.jpeg" alt="ICS IPU Icon">
+        </div>
+        <div class="ipu-title">Dayton IPU</div>
+      </a>
+
+      <a class="ipu-card" href="ipu.html?ipu_id=2&name=ButlerWarren" aria-label="Open Butler Warren IPU">
+        <div class="ipu-icon">
+          <img src="zz.ICS_true_logo.jpeg" alt="ICS IPU Icon">
+        </div>
+        <div class="ipu-title">Butler Warren IPU</div>
+      </a>
+
+      <a class="ipu-card" href="ipu.html?ipu_id=3&name=MiamiCounty" aria-label="Open Miami County IPU">
+        <div class="ipu-icon">
+          <img src="zz.ICS_true_logo.jpeg" alt="ICS IPU Icon">
+        </div>
+        <div class="ipu-title">Miami County IPU</div>
+      </a>
+    </div>
+  </main>
+
+  <footer>© OHI • Innovative Care Solutions — Internal use only</footer>
+
+  <!-- QUICK PEEK MODAL -->
+  <div id="quickPeekModal" class="modal" aria-hidden="true">
+    <div class="modal-shell" role="dialog" aria-modal="true" aria-labelledby="quickPeekTitle">
+      <div class="modal-head">
+        <div class="modal-head-left">
+          <div id="quickPeekTitle" class="modal-title">Quick Peek Dispatch View</div>
+          <div class="modal-sub">Live shortage cards for all inpatient units</div>
+        </div>
+        <button id="closeQuickPeekBtn" class="icon-btn" type="button" aria-label="Close Quick Peek">×</button>
+      </div>
+
+      <div class="modal-body">
+        <div id="quickPeekGrid" class="peek-grid"></div>
+      </div>
+    </div>
+  </div>
+
+  <div id="toast" class="toast" aria-live="polite"></div>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+
+  <script>
+  const quickPeekBtn = document.getElementById("quickPeekBtn");
+  const quickPeekModal = document.getElementById("quickPeekModal");
+  const closeQuickPeekBtn = document.getElementById("closeQuickPeekBtn");
+  const quickPeekGrid = document.getElementById("quickPeekGrid");
+  const toastEl = document.getElementById("toast");
+
+  let latestQuickPeekData = [];
+
+  async function fetchQuickPeekData() {
+    const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNvc3lxZGdlcWdmdWNsZmZtemdsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Njk3ODA0MjgsImV4cCI6MjA4NTM1NjQyOH0.quknRUYbRqvLMpsCKjlytN38hek5sk1v1o6KJEwTCxQ";
+
+    const res = await fetch(
+      "https://sosyqdgeqgfuclffmzgl.supabase.co/functions/v1/quick-peek",
+      {
+        method: "GET",
+        headers: {
+          "apikey": SUPABASE_ANON_KEY,
+          "Authorization": `Bearer ${SUPABASE_ANON_KEY}`
+        }
+      }
+    );
+
+    if (!res.ok) {
+      const text = await res.text();
+      console.error("Quick Peek failed:", res.status, text);
+      throw new Error(`Failed to load Quick Peek data: ${res.status}`);
+    }
+
+    return await res.json();
   }
 
-  // UNDO LAST MANUAL TAKE 1
-  if (lastAction.source === "manual" && lastAction.action === "take_1") {
-    const row = TRACKED_ITEMS.find(x => x.item === lastAction.item_name);
-    if (!row) {
-      showToast({ state:"error", icon:"✕", meta:"Undo failed", detail:"Item not found" });
-      return;
+  function escapeHtml(value) {
+    return String(value ?? "")
+      .replace(/&/g, "&amp;")
+      .replace(/</g, "&lt;")
+      .replace(/>/g, "&gt;")
+      .replace(/"/g, "&quot;")
+      .replace(/'/g, "&#039;");
+  }
+
+  function showToast(message) {
+    toastEl.textContent = message;
+    toastEl.classList.add("show");
+
+    clearTimeout(showToast._timer);
+    showToast._timer = setTimeout(() => {
+      toastEl.classList.remove("show");
+    }, 2200);
+  }
+
+  function openQuickPeekModal() {
+    quickPeekModal.classList.add("show");
+    quickPeekModal.setAttribute("aria-hidden", "false");
+    document.body.style.overflow = "hidden";
+  }
+
+  function closeQuickPeekModal() {
+    quickPeekModal.classList.remove("show");
+    quickPeekModal.setAttribute("aria-hidden", "true");
+    document.body.style.overflow = "";
+  }
+
+  function buildCardText(ipu) {
+    const lines = [];
+    lines.push(ipu.ipu_name);
+    lines.push(ipu.address || "");
+    lines.push("");
+    lines.push("Needed Items");
+
+    if (!Array.isArray(ipu.needed_items) || ipu.needed_items.length === 0) {
+      lines.push("Fully stocked");
+    } else {
+      for (const item of ipu.needed_items) {
+        lines.push(`- ${item.item_name} x${item.qty_needed}`);
+      }
     }
 
-    showToast({ state:"pending", icon:"…", meta:"Undo", detail:row.item });
+    return lines.join("\n");
+  }
+
+  function renderQuickPeekCards(ipus) {
+    quickPeekGrid.innerHTML = ipus.map((ipu) => {
+      const items = Array.isArray(ipu.needed_items) ? ipu.needed_items : [];
+      const itemCount = items.length;
+      const totalUnitsNeeded = items.reduce((sum, item) => {
+        return sum + Number(item.qty_needed || 0);
+      }, 0);
+
+      const itemsHtml = items.length
+        ? `
+          <ul class="peek-list">
+            ${items.map((item) => `
+              <li class="peek-item">
+                <div class="peek-item-name">${escapeHtml(item.item_name)}</div>
+                <div class="peek-item-qty">x${escapeHtml(item.qty_needed)}</div>
+              </li>
+            `).join("")}
+          </ul>
+        `
+        : `<div class="peek-empty">Fully stocked</div>`;
+
+      return `
+        <div class="peek-card" id="peek-card-${escapeHtml(ipu.ipu_id)}">
+          <div class="peek-card-top">
+            <div class="peek-ticket">Dispatch Ticket</div>
+            <div class="peek-name">${escapeHtml(ipu.ipu_name)}</div>
+            <div class="peek-address">${escapeHtml(ipu.address || "")}</div>
+
+            <div class="peek-stats">
+              ${
+                itemCount > 0
+                  ? `
+                    <div class="peek-pill need">${itemCount} item${itemCount === 1 ? "" : "s"} needed</div>
+                    <div class="peek-pill need">${totalUnitsNeeded} total unit${totalUnitsNeeded === 1 ? "" : "s"}</div>
+                  `
+                  : `<div class="peek-pill stocked">Fully stocked</div>`
+              }
+            </div>
+          </div>
+
+          <div class="peek-card-mid">
+            <div class="peek-section-label">Needed Items</div>
+            ${itemsHtml}
+          </div>
+
+          <div class="peek-card-foot">
+            <button class="btn-primary" type="button" data-copy-card="${escapeHtml(ipu.ipu_id)}">Copy</button>
+            <button class="btn-secondary" type="button" data-copy-text="${escapeHtml(ipu.ipu_id)}">Copy Text</button>
+            <div class="peek-note">Copy tries image first. Copy Text is the plain-text fallback.</div>
+          </div>
+        </div>
+      `;
+    }).join("");
+  }
+
+  function isClipboardImageSupported() {
+    return !!(
+      window.isSecureContext &&
+      navigator.clipboard &&
+      typeof navigator.clipboard.write === "function" &&
+      window.ClipboardItem
+    );
+  }
+
+  function canvasToBlobSafe(canvas) {
+    return new Promise((resolve, reject) => {
+      canvas.toBlob((blob) => {
+        if (blob) {
+          resolve(blob);
+        } else {
+          reject(new Error("Canvas could not be converted to PNG blob"));
+        }
+      }, "image/png");
+    });
+  }
+
+  async function writeImageToClipboard(blob) {
+    if (!window.isSecureContext) {
+      throw new Error("Clipboard image copy requires HTTPS or localhost");
+    }
+
+    if (!navigator.clipboard || typeof navigator.clipboard.write !== "function") {
+      throw new Error("Browser does not support clipboard image write");
+    }
+
+    if (typeof ClipboardItem === "undefined") {
+      throw new Error("ClipboardItem API not supported");
+    }
+
+    const item = new ClipboardItem({
+      "image/png": blob
+    });
+
+    await navigator.clipboard.write([item]);
+  }
+
+  async function createCardCaptureCanvas(cardEl) {
+    if (!cardEl) {
+      throw new Error("Card element not found");
+    }
+
+    if (document.fonts?.ready) {
+      try {
+        await document.fonts.ready;
+      } catch (error) {
+        console.warn("Font readiness check failed:", error);
+      }
+    }
+
+    const rect = cardEl.getBoundingClientRect();
+    const width = Math.ceil(rect.width);
+
+    const stage = document.createElement("div");
+    stage.style.position = "fixed";
+    stage.style.left = "-100000px";
+    stage.style.top = "0";
+    stage.style.pointerEvents = "none";
+    stage.style.opacity = "1";
+    stage.style.zIndex = "-1";
+    stage.style.background = "transparent";
+
+    const wrap = document.createElement("div");
+    wrap.style.width = `${width}px`;
+
+    const clone = cardEl.cloneNode(true);
+    clone.style.transform = "none";
+    clone.style.opacity = "1";
+    clone.style.filter = "none";
+
+    const foot = clone.querySelector(".peek-card-foot");
+    if (foot) {
+      foot.remove();
+    }
+
+    wrap.appendChild(clone);
+    stage.appendChild(wrap);
+    document.body.appendChild(stage);
 
     try {
-      await updateSingleTotal(row.item_id, row.onHand + 1, row.par);
-
-      showToast({
-        state:"success",
-        icon:"↺",
-        meta:"Undo complete",
-        detail:row.item
+      const canvas = await html2canvas(clone, {
+        backgroundColor: "#ffffff",
+        useCORS: true,
+        allowTaint: false,
+        scale: 2,
+        logging: false
       });
 
-      lastAction = null;
-      document.getElementById("undoBtn").disabled = true;
-      await loadTotals();
-      return;
-    } catch (err) {
-      showToast({
-        state:"error",
-        icon:"✕",
-        meta:"Undo failed",
-        detail:String(err).slice(0, 180)
-      });
-      return;
+      return canvas;
+    } finally {
+      stage.remove();
     }
   }
 
-  showToast({ state:"warn", icon:"!", meta:"Undo", detail:"Nothing to undo" });
-}
-document.getElementById("undoBtn").addEventListener("click", doUndo);
+  async function copyCardImageById(ipuId, triggerButton) {
+    const ipu = latestQuickPeekData.find((item) => String(item.ipu_id) === String(ipuId));
+    const cardEl = document.getElementById(`peek-card-${ipuId}`);
 
-/* ============================================================
-   HISTORY BUTTON
-============================================================ */
-document.getElementById("historyBtn").addEventListener("click", () => {
-  const rows = movements.slice(0, 12).map(m =>
-    `${m.time} · ${m.source.toUpperCase()} · ${m.action} · ${m.status || ""} · ${m.item_name}${m.asset_number ? " · " + m.asset_number : ""}`
-  );
-  alert(rows.length ? rows.join("\n") : "No movement yet.");
-});
+    if (!ipu || !cardEl) {
+      showToast("Card data not found");
+      return;
+    }
 
-/* ============================================================
-   INIT
-============================================================ */
-async function init(){
-  try {
-    await loadTotals();
-    showToast({ state:"success", icon:"✓", meta:"Ready", detail:`${ipuName} IPU online` });
-  } catch (err) {
-    console.error(err);
-    showToast({ state:"error", icon:"✕", meta:"Load failed", detail:String(err).slice(0, 180) });
+    const originalText = triggerButton?.textContent || "";
+    const originalDisabled = !!triggerButton?.disabled;
+
+    try {
+      if (triggerButton) {
+        triggerButton.disabled = true;
+        triggerButton.textContent = "Copying...";
+      }
+
+      const canvas = await createCardCaptureCanvas(cardEl);
+      const blob = await canvasToBlobSafe(canvas);
+      await writeImageToClipboard(blob);
+
+      showToast(`${ipu.ipu_name} image copied`);
+    } catch (error) {
+      console.error("IMAGE COPY ERROR:", error);
+      showToast(error.message || "Image copy failed");
+    } finally {
+      if (triggerButton) {
+        triggerButton.disabled = originalDisabled;
+        triggerButton.textContent = originalText;
+      }
+    }
   }
 
-  setTimeout(() => assetInput.focus(), 200);
-}
+  async function copyCardTextById(ipuId, triggerButton) {
+    const ipu = latestQuickPeekData.find((item) => String(item.ipu_id) === String(ipuId));
 
-init();
+    if (!ipu) {
+      showToast("Card data not found");
+      return;
+    }
+
+    const originalText = triggerButton?.textContent || "";
+    const originalDisabled = !!triggerButton?.disabled;
+
+    try {
+      if (triggerButton) {
+        triggerButton.disabled = true;
+        triggerButton.textContent = "Copying...";
+      }
+
+      await navigator.clipboard.writeText(buildCardText(ipu));
+      showToast(`${ipu.ipu_name} text copied`);
+    } catch (error) {
+      console.error("TEXT COPY ERROR:", error);
+      showToast("Clipboard text copy failed");
+    } finally {
+      if (triggerButton) {
+        triggerButton.disabled = originalDisabled;
+        triggerButton.textContent = originalText;
+      }
+    }
+  }
+
+  quickPeekBtn.addEventListener("click", async () => {
+    try {
+      quickPeekBtn.disabled = true;
+      quickPeekBtn.textContent = "Loading...";
+
+      const data = await fetchQuickPeekData();
+      latestQuickPeekData = data;
+
+      renderQuickPeekCards(data);
+      openQuickPeekModal();
+
+      if (!isClipboardImageSupported()) {
+        console.warn("Image clipboard not supported in this context. Use HTTPS or localhost in Chromium.");
+      }
+    } catch (error) {
+      console.error("Quick Peek click error:", error);
+      showToast(error.message || "Quick Peek failed to load");
+    } finally {
+      quickPeekBtn.disabled = false;
+      quickPeekBtn.textContent = "Quick Peek";
+    }
+  });
+
+  closeQuickPeekBtn.addEventListener("click", closeQuickPeekModal);
+
+  quickPeekModal.addEventListener("click", (event) => {
+    if (event.target === quickPeekModal) {
+      closeQuickPeekModal();
+    }
+  });
+
+  document.addEventListener("keydown", (event) => {
+    if (event.key === "Escape" && quickPeekModal.classList.contains("show")) {
+      closeQuickPeekModal();
+    }
+  });
+
+  quickPeekGrid.addEventListener("click", async (event) => {
+    const copyBtn = event.target.closest("[data-copy-card]");
+    const copyTextBtn = event.target.closest("[data-copy-text]");
+
+    if (copyBtn) {
+      const ipuId = copyBtn.getAttribute("data-copy-card");
+      await copyCardImageById(ipuId, copyBtn);
+      return;
+    }
+
+    if (copyTextBtn) {
+      const ipuId = copyTextBtn.getAttribute("data-copy-text");
+      await copyCardTextById(ipuId, copyTextBtn);
+    }
+  });
 </script>
-
 </body>
 </html>
