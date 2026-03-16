@@ -453,7 +453,7 @@ main{
 <main>
   <div class="topbar">
     <div class="topbar-left">
-      <a class="backlink-top" href="admin.html">
+      <a class="backlink-top" href="#" id="backToAdminBtn">
         <span aria-hidden="true">←</span>
         <span>Back to Admin</span>
       </a>
@@ -577,6 +577,18 @@ main{
 <script>
 const EDGE_URL = "https://sosyqdgeqgfuclffmzgl.supabase.co/functions/v1/IPU_Inventory";
 const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNvc3lxZGdlcWdmdWNsZmZtemdsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Njk3ODA0MjgsImV4cCI6MjA4NTM1NjQyOH0.quknRUYbRqvLMpsCKjlytN38hek5sk1v1o6KJEwTCxQ";
+
+const qs = new URLSearchParams(location.search);
+const IPU_ID = Number(qs.get("ipu_id") || 1);
+const ipuName = qs.get("name") || "Dayton IPU";
+const ipuAddress = qs.get("address") || "324 Wilmington Ave., Dayton, OH 45420";
+
+const backToAdminBtn = document.getElementById("backToAdminBtn");
+
+if (backToAdminBtn) {
+  backToAdminBtn.href =
+    `admin.html?ipu_id=${encodeURIComponent(IPU_ID)}&name=${encodeURIComponent(ipuName)}&address=${encodeURIComponent(ipuAddress)}`;
+}
 
 const headers = {
   "Content-Type": "application/json",
