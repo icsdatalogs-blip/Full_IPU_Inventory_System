@@ -396,17 +396,27 @@ td.qty.on.par-bad{
   box-shadow: 0 10px 18px rgba(16,24,40,.06);
 }
 .tool-left{ display:flex; align-items:center; gap:12px; min-width:0; }
+
 .tool-icon{
-  width:40px; height:40px; border-radius:12px;
-  background:
-    radial-gradient(16px 16px at 30% 30%, rgba(var(--orange-rgb),.45), transparent 62%),
-    radial-gradient(18px 18px at 70% 60%, rgba(var(--teal-rgb),.38), transparent 64%),
-    rgba(255,255,255,.72);
-  border: 1px solid rgba(0,0,0,.06);
-  box-shadow: 0 10px 18px rgba(0,0,0,.06);
-  display:grid; place-items:center;
-  flex: 0 0 auto;
+  width:40px;
+  height:40px;
+  border-radius:12px;
+  background: rgba(255,255,255,.96);
+  border:1px solid rgba(15,23,42,.08);
+  box-shadow: 0 6px 14px rgba(0,0,0,.05);
+  display:grid;
+  place-items:center;
+  flex:0 0 auto;
+  overflow:hidden;
 }
+
+.tool-icon-img{
+  width:22px;
+  height:22px;
+  object-fit:contain;
+  display:block;
+}
+
 .tool-title{ font-weight:1000; color: rgba(15,23,42,.78); font-size:15px; }
 .tool-sub{ font-size:11px; font-weight:800; color: rgba(15,23,42,.52); margin-top:2px; }
 .tool-text{ min-width:0; }
@@ -986,7 +996,9 @@ td.qty.on.par-bad{
         <div class="admin-list">
           <div class="tool-card" role="button" tabindex="0" id="invTool">
             <div class="tool-left">
-              <div class="tool-icon" aria-hidden="true">📦</div>
+              <div class="tool-icon" aria-hidden="true">
+                <img src="zz.inventory icon.png" alt="" class="tool-icon-img">
+              </div>
               <div class="tool-text">
                 <div class="tool-title">Inventory Management</div>
                 <div class="tool-sub">Add/edit serialized assets · item mapping</div>
@@ -997,7 +1009,9 @@ td.qty.on.par-bad{
 
           <div class="tool-card" role="button" tabindex="0" id="parTool">
             <div class="tool-left">
-              <div class="tool-icon" aria-hidden="true">🎯</div>
+              <div class="tool-icon" aria-hidden="true">
+                <img src="zz.Par icon.png" alt="" class="tool-icon-img">
+              </div>
               <div class="tool-text">
                 <div class="tool-title">Par Level Management</div>
                 <div class="tool-sub">Set targets per IPU · track shortages</div>
@@ -1008,7 +1022,9 @@ td.qty.on.par-bad{
 
           <div class="tool-card" role="button" tabindex="0" id="histTool">
             <div class="tool-left">
-              <div class="tool-icon" aria-hidden="true">🧾</div>
+              <div class="tool-icon" aria-hidden="true">
+                <img src="zz.History icon.png" alt="" class="tool-icon-img">
+              </div>
               <div class="tool-text">
                 <div class="tool-title">History</div>
                 <div class="tool-sub">Movement log · filters · audit trail</div>
@@ -1715,12 +1731,12 @@ async function loadHistory(){
 
     notify({ type:"pending", title:"Loading", message:"Fetching history…" });
 
-  const url =
-    `${REST_BASE}/rest/v1/${HISTORY_TABLE}` +
-    `?select=id,created_at,ipu_id,asset_id,item_id,scanner_role,scan_type,result,assets(asset_number,item_id,items(name)),items(name)` +
-    `&ipu_id=eq.${IPU_ID}` +
-    `&order=created_at.desc` +
-    `&limit=250`;
+    const url =
+      `${REST_BASE}/rest/v1/${HISTORY_TABLE}` +
+      `?select=id,created_at,ipu_id,asset_id,item_id,scanner_role,scan_type,result,assets(asset_number,item_id,items(name)),items(name)` +
+      `&ipu_id=eq.${IPU_ID}` +
+      `&order=created_at.desc` +
+      `&limit=250`;
 
     const res = await fetch(url, { headers: sbHeaders() });
 
