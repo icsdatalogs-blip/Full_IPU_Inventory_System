@@ -920,7 +920,7 @@ td.qty.on.par-bad{
 <main>
   <div class="topbar">
     <div class="topbar-left">
-      <a class="backlink-top" href="ipu.html?ipu_id=1&name=Dayton" aria-label="Back to IPU">
+      <a class="backlink-top" href="#" id="backToIpuBtn" aria-label="Back to IPU">
         <span aria-hidden="true">←</span> <span>Back to IPU</span>
       </a>
       <div>
@@ -1121,6 +1121,16 @@ td.qty.on.par-bad{
 const REST_BASE = "https://sosyqdgeqgfuclffmzgl.supabase.co";
 const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNvc3lxZGdlcWdmdWNsZmZtemdsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Njk3ODA0MjgsImV4cCI6MjA4NTM1NjQyOH0.quknRUYbRqvLMpsCKjlytN38hek5sk1v1o6KJEwTCxQ";
 const IPU_ID = Number(new URLSearchParams(location.search).get("ipu_id") || 1);
+
+const qs = new URLSearchParams(location.search);
+const ipuName = qs.get("name") || "Dayton IPU";
+const ipuAddress = qs.get("address") || "324 Wilmington Ave., Dayton, OH 45420";
+
+const backToIpuBtn = document.getElementById("backToIpuBtn");
+
+if (backToIpuBtn) {
+  backToIpuBtn.href = `ipu.html?ipu_id=${encodeURIComponent(IPU_ID)}&name=${encodeURIComponent(ipuName)}&address=${encodeURIComponent(ipuAddress)}`;
+}
 
 const EDGE_URL = "https://sosyqdgeqgfuclffmzgl.supabase.co/functions/v1/asset-movement";
 const CONTRACT = { scanTypes: { OUT:"scan_out", IN:"scan_in", VERIFY:"verify" } };
