@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -187,33 +186,6 @@ main{
   box-shadow: 0 0 0 4px var(--focus);
 }
 
-.segmented{
-  display:flex;
-  gap:8px;
-  padding:4px;
-  border:1px solid rgba(15,23,42,.08);
-  border-radius:14px;
-  background: rgba(255,255,255,.78);
-}
-.seg-btn{
-  flex:1;
-  height:36px;
-  border:none;
-  border-radius:10px;
-  background:transparent;
-  color: rgba(15,23,42,.58);
-  font-size:12px;
-  font-weight:900;
-  cursor:pointer;
-  transition: background .16s var(--ease), color .16s var(--ease), transform .16s var(--ease);
-}
-.seg-btn.active{
-  background: rgba(255,255,255,.98);
-  color: rgba(15,23,42,.82);
-  box-shadow: 0 1px 2px rgba(16,24,40,.05);
-}
-.seg-btn:hover{ transform: translateY(-1px); }
-
 .action-row{
   display:flex;
   gap:8px;
@@ -356,7 +328,7 @@ main{
   position: fixed;
   right: 16px;
   top: 16px;
-  width: min(380px, calc(100vw - 32px));
+  width: min(420px, calc(100vw - 32px));
   border-radius: 14px;
   border:1px solid rgba(148,163,184,.45);
   background: rgba(148,163,184,.18);
@@ -414,7 +386,7 @@ main{
 
   <div class="header-title">OHI • Innovative Care Solutions</div>
   <div class="header-sub">Inventory Management</div>
-  <div class="header-tagline">Serialized assets · add · move · delete</div>
+  <div class="header-tagline">Serialized assets · modify · status · delete</div>
 
   <div class="wave-layer" aria-hidden="true">
     <svg class="wave-top" viewBox="0 0 1200 220" preserveAspectRatio="none">
@@ -471,61 +443,67 @@ main{
   <div class="grid">
     <section class="ui-card">
       <div class="ui-card-title">
-        <span>Asset Actions</span>
-        <span class="ui-subtle">Create · move · remove</span>
-      </div>
-
-      <div class="segmented">
-        <button class="seg-btn active" data-mode="add" type="button">Add Asset</button>
-        <button class="seg-btn" data-mode="move" type="button">Move Asset</button>
-        <button class="seg-btn" data-mode="delete" type="button">Delete Asset</button>
+        <span>Add Asset</span>
+        <span class="ui-subtle">Create new serialized asset</span>
       </div>
 
       <div class="stack" style="margin-top:10px;">
-        <div id="addFields" class="stack">
-          <div class="field-group">
-            <label class="field-label" for="addAsset">Asset Number</label>
-            <input id="addAsset" class="ui-input" />
-          </div>
-
-          <div class="field-group">
-            <label class="field-label" for="addItem">Item Type</label>
-            <select id="addItem" class="ui-select"></select>
-          </div>
-
-          <div class="field-group">
-            <label class="field-label" for="addLocation">Location</label>
-            <select id="addLocation" class="ui-select"></select>
-          </div>
-
-          <div class="action-row">
-            <button class="enter-btn" id="addBtn" type="button">Add Asset</button>
-          </div>
+        <div class="field-group">
+          <label class="field-label" for="addAsset">Asset Number</label>
+          <input id="addAsset" class="ui-input" />
         </div>
 
-        <div id="moveFields" class="stack hidden">
-          <div class="field-group">
-            <label class="field-label" for="moveAsset">Asset Number</label>
-            <input id="moveAsset" class="ui-input" />
-          </div>
-
-          <div class="field-group">
-            <label class="field-label" for="moveLocation">New Location</label>
-            <select id="moveLocation" class="ui-select"></select>
-          </div>
-
-          <div class="action-row">
-            <button class="enter-btn warn-btn" id="moveBtn" type="button">Move Asset</button>
-          </div>
+        <div class="field-group">
+          <label class="field-label" for="addItem">Item Type</label>
+          <select id="addItem" class="ui-select"></select>
         </div>
 
-        <div id="deleteFields" class="stack hidden">
+        <div class="field-group">
+          <label class="field-label" for="addLocation">Location</label>
+          <select id="addLocation" class="ui-select"></select>
+        </div>
+
+        <div class="action-row">
+          <button class="enter-btn" id="addBtn" type="button">Add Asset</button>
+        </div>
+      </div>
+
+      <div class="ui-card-title" style="margin-top:18px;">
+        <span>Modify Asset</span>
+        <span class="ui-subtle">Update · move · status · delete</span>
+      </div>
+
+      <div class="stack" style="margin-top:10px;">
+        <div class="field-group">
+          <label class="field-label" for="modifyAsset">Asset Number</label>
+          <input id="modifyAsset" class="ui-input" />
+        </div>
+
+        <div class="action-row">
+          <button class="enter-btn" id="loadModifyBtn" type="button">Load Asset</button>
+        </div>
+
+        <div id="modifyFields" class="stack hidden">
           <div class="field-group">
-            <label class="field-label" for="deleteAsset">Asset Number</label>
-            <input id="deleteAsset" class="ui-input" />
+            <label class="field-label" for="modifyItem">Item Type</label>
+            <select id="modifyItem" class="ui-select"></select>
+          </div>
+
+          <div class="field-group">
+            <label class="field-label" for="modifyLocation">Item Location</label>
+            <select id="modifyLocation" class="ui-select"></select>
+          </div>
+
+          <div class="field-group">
+            <label class="field-label" for="modifyStatus">Item Status</label>
+            <select id="modifyStatus" class="ui-select">
+              <option value="active">Active</option>
+              <option value="inactive">Inactive</option>
+            </select>
           </div>
 
           <div class="action-row">
+            <button class="enter-btn warn-btn" id="saveModifyBtn" type="button">Save Changes</button>
             <button class="danger-btn" id="deleteBtn" type="button">Delete Asset</button>
           </div>
         </div>
@@ -536,7 +514,7 @@ main{
       <div class="table-head">
         <div class="ui-card-title" style="margin:0;">
           <span>Asset Inventory</span>
-          <span class="ui-subtle">Search and refine results</span>
+          <span class="ui-subtle">Active assets only</span>
         </div>
         <div id="resultCount" class="ui-subtle">0 of 0</div>
       </div>
@@ -576,7 +554,7 @@ main{
 
 <script>
 const EDGE_URL = "https://sosyqdgeqgfuclffmzgl.supabase.co/functions/v1/IPU_Inventory";
-const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNvc3lxZGdlcWdmdWNsZmZtemdsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Njk3ODA0MjgsImV4cCI6MjA4NTM1NjQyOH0.quknRUYbRqvLMpsCKjlytN38hek5sk1v1o6KJEwTCxQ";
+const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJIUzI1NiIsInR5cCI6IkpXVCJ9".replace("eyJpc3MiOiJIUzI1NiIsInR5cCI6IkpXVCJ9","eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNvc3lxZGdlcWdmdWNsZmZtemdsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Njk3ODA0MjgsImV4cCI6MjA4NTM1NjQyOH0.quknRUYbRqvLMpsCKjlytN38hek5sk1v1o6KJEwTCxQ");
 
 const qs = new URLSearchParams(location.search);
 const IPU_ID = Number(qs.get("ipu_id") || 1);
@@ -584,7 +562,6 @@ const ipuName = qs.get("name") || "Dayton IPU";
 const ipuAddress = qs.get("address") || "324 Wilmington Ave., Dayton, OH 45420";
 
 const backToAdminBtn = document.getElementById("backToAdminBtn");
-
 if (backToAdminBtn) {
   backToAdminBtn.href =
     `admin.html?ipu_id=${encodeURIComponent(IPU_ID)}&name=${encodeURIComponent(ipuName)}&address=${encodeURIComponent(ipuAddress)}`;
@@ -601,14 +578,16 @@ const emptyState = document.getElementById("emptyState");
 const resultCount = document.getElementById("resultCount");
 
 const addAssetInput = document.getElementById("addAsset");
-const moveAssetInput = document.getElementById("moveAsset");
-const deleteAssetInput = document.getElementById("deleteAsset");
-
 const addItem = document.getElementById("addItem");
 const addLocation = document.getElementById("addLocation");
-const moveLocation = document.getElementById("moveLocation");
-const locationFilter = document.getElementById("locationFilter");
 
+const modifyAssetInput = document.getElementById("modifyAsset");
+const modifyItem = document.getElementById("modifyItem");
+const modifyLocation = document.getElementById("modifyLocation");
+const modifyStatus = document.getElementById("modifyStatus");
+const modifyFields = document.getElementById("modifyFields");
+
+const locationFilter = document.getElementById("locationFilter");
 const searchBox = document.getElementById("searchBox");
 
 const pageInfo = document.getElementById("pageInfo");
@@ -620,11 +599,6 @@ const ftIcon = document.getElementById("ftIcon");
 const ftTitle = document.getElementById("ftTitle");
 const ftMsg = document.getElementById("ftMsg");
 
-const segButtons = document.querySelectorAll(".seg-btn");
-const addFields = document.getElementById("addFields");
-const moveFields = document.getElementById("moveFields");
-const deleteFields = document.getElementById("deleteFields");
-
 let toastTimer = null;
 let searchTimer = null;
 let locationMap = {};
@@ -634,6 +608,7 @@ let totalDbCount = 0;
 let currentOffset = 0;
 let currentLimit = 100;
 let currentQuery = "";
+let loadedAsset = null;
 
 function notify(type, title, msg) {
   const iconMap = { success: "✓", warn: "!", error: "✕" };
@@ -644,7 +619,7 @@ function notify(type, title, msg) {
   ftMsg.textContent = msg;
   ft.classList.add("show");
   clearTimeout(toastTimer);
-  toastTimer = setTimeout(() => ft.classList.remove("show"), 2600);
+  toastTimer = setTimeout(() => ft.classList.remove("show"), 3200);
 }
 
 async function callEdge(payload) {
@@ -662,7 +637,7 @@ async function callEdge(payload) {
   }
 
   if (!res.ok) {
-    throw new Error(data.details || data.error || "Request failed");
+    throw new Error(data.error || data.details || "Request failed");
   }
 
   return data;
@@ -684,16 +659,6 @@ function fillSelect(select, items, placeholder) {
   });
 }
 
-function setMode(mode) {
-  segButtons.forEach(btn => {
-    btn.classList.toggle("active", btn.dataset.mode === mode);
-  });
-
-  addFields.classList.toggle("hidden", mode !== "add");
-  moveFields.classList.toggle("hidden", mode !== "move");
-  deleteFields.classList.toggle("hidden", mode !== "delete");
-}
-
 function updatePager() {
   const totalPages = Math.max(1, Math.ceil(filteredDbCount / currentLimit));
   const currentPage = Math.floor(currentOffset / currentLimit) + 1;
@@ -701,6 +666,14 @@ function updatePager() {
   pageInfo.textContent = `Page ${currentPage} of ${totalPages}`;
   prevBtn.disabled = currentOffset === 0;
   nextBtn.disabled = currentOffset + currentLimit >= filteredDbCount;
+}
+
+function resetModifyPanel() {
+  loadedAsset = null;
+  modifyFields.classList.add("hidden");
+  modifyItem.value = "";
+  modifyLocation.value = "";
+  modifyStatus.value = "active";
 }
 
 async function loadItemsAndLocations() {
@@ -715,7 +688,8 @@ async function loadItemsAndLocations() {
 
   fillSelect(addItem, sortedItems, "Select item");
   fillSelect(addLocation, locationsRes.locations || [], "Select location");
-  fillSelect(moveLocation, locationsRes.locations || [], "Select location");
+  fillSelect(modifyItem, sortedItems, "Select item");
+  fillSelect(modifyLocation, locationsRes.locations || [], "Select location");
 
   locationFilter.innerHTML = "";
   locationMap = {};
@@ -810,19 +784,7 @@ function renderTable() {
   const end = Math.min(currentOffset + allAssets.length, filteredDbCount);
 
   if (!currentQuery) {
-    if (start === end) {
-      resultCount.textContent = `${end} of ${filteredDbCount} · total ${totalDbCount}`;
-      updatePager();
-      return;
-    }
-
     resultCount.textContent = `${start}-${end} of ${filteredDbCount} · total ${totalDbCount}`;
-    updatePager();
-    return;
-  }
-
-  if (start === end) {
-    resultCount.textContent = `${end} of ${filteredDbCount} matching · total ${totalDbCount}`;
     updatePager();
     return;
   }
@@ -841,6 +803,8 @@ async function addAsset() {
       notify("warn", "Missing fields", "Complete all fields.");
       return;
     }
+
+    if (!confirm(`Add asset ${asset_number} to inventory?`)) return;
 
     const data = await callEdge({
       action: "create_asset",
@@ -867,46 +831,9 @@ async function addAsset() {
   }
 }
 
-async function moveAsset() {
+async function loadModifyAsset() {
   try {
-    const asset_number = moveAssetInput.value.trim().toUpperCase();
-    const location_id = moveLocation.value;
-
-    if (!asset_number || !location_id) {
-      notify("warn", "Missing fields", "Enter asset and location.");
-      return;
-    }
-
-    const existing = await callEdge({
-      action: "get_asset",
-      asset_number
-    });
-
-    if (existing.status === "not_found" || !existing.asset) {
-      notify("warn", "Not found", "Asset does not exist.");
-      return;
-    }
-
-    await callEdge({
-      action: "move_asset",
-      id: Number(existing.asset.id),
-      location_id: Number(location_id)
-    });
-
-    moveAssetInput.value = "";
-    moveLocation.value = "";
-
-    notify("success", "Asset moved", asset_number);
-    await loadTable();
-  } catch (err) {
-    console.error(err);
-    notify("error", "Move failed", String(err.message || err));
-  }
-}
-
-async function deleteAsset() {
-  try {
-    const asset_number = deleteAssetInput.value.trim().toUpperCase();
+    const asset_number = modifyAssetInput.value.trim().toUpperCase();
 
     if (!asset_number) {
       notify("warn", "Missing asset", "Enter asset number.");
@@ -919,23 +846,110 @@ async function deleteAsset() {
     });
 
     if (existing.status === "not_found" || !existing.asset) {
+      resetModifyPanel();
       notify("warn", "Not found", "Asset does not exist.");
       return;
     }
 
-    await callEdge({
+    loadedAsset = existing.asset;
+    modifyFields.classList.remove("hidden");
+    modifyItem.value = String(existing.asset.item_id || "");
+    modifyLocation.value = String(existing.asset.location_id || "");
+    modifyStatus.value = existing.asset.is_active ? "active" : "inactive";
+
+    notify("success", "Asset loaded", existing.asset.asset_number);
+  } catch (err) {
+    console.error(err);
+    resetModifyPanel();
+    notify("error", "Load failed", String(err.message || err));
+  }
+}
+
+async function saveModifyAsset() {
+  try {
+    if (!loadedAsset) {
+      notify("warn", "No asset loaded", "Load an asset first.");
+      return;
+    }
+
+    const asset_number = modifyAssetInput.value.trim().toUpperCase();
+    const item_id = Number(modifyItem.value);
+    const selectedLocation = Number(modifyLocation.value);
+    const is_active = modifyStatus.value === "active";
+
+    if (!asset_number || !item_id || !selectedLocation) {
+      notify("warn", "Missing fields", "Complete all modify fields.");
+      return;
+    }
+
+    if (!is_active) {
+      if (!confirm(
+        `Set asset ${asset_number} to inactive?\n\nThis will remove it from all on-hand counts and move it out of active inventory until reactivated.`
+      )) return;
+    } else {
+      if (!confirm(`Apply changes to asset ${asset_number}?`)) return;
+    }
+
+    const payload = {
+      action: "update_asset",
+      id: Number(loadedAsset.id),
+      asset_number,
+      item_id,
+      location_id: selectedLocation,
+      is_active
+    };
+
+    const data = await callEdge(payload);
+
+    loadedAsset = data.asset;
+    modifyAssetInput.value = data.asset.asset_number || asset_number;
+    modifyItem.value = String(data.asset.item_id || "");
+    modifyLocation.value = String(data.asset.location_id || "");
+    modifyStatus.value = data.asset.is_active ? "active" : "inactive";
+
+    notify("success", "Asset updated", data.asset.asset_number || asset_number);
+    await loadTable();
+  } catch (err) {
+    console.error(err);
+    notify("error", "Save failed", String(err.message || err));
+  }
+}
+
+async function deleteAsset() {
+  try {
+    if (!loadedAsset) {
+      notify("warn", "No asset loaded", "Load an asset first.");
+      return;
+    }
+
+    const asset_number = modifyAssetInput.value.trim().toUpperCase();
+
+    if (!asset_number) {
+      notify("warn", "Missing asset", "Enter asset number.");
+      return;
+    }
+
+    if (!confirm(`Delete asset ${asset_number}? This cannot be undone.`)) return;
+
+    const data = await callEdge({
       action: "delete_asset",
-      id: Number(existing.asset.id)
+      id: Number(loadedAsset.id)
     });
 
-    deleteAssetInput.value = "";
+    modifyAssetInput.value = "";
+    resetModifyPanel();
 
-    notify("success", "Asset deleted", asset_number);
+    notify("success", "Asset deleted", data.deleted_asset_number || asset_number);
     currentOffset = 0;
     await loadTable();
   } catch (err) {
     console.error(err);
-    notify("error", "Delete failed", String(err.message || err));
+    const msg = String(err.message || err);
+    if (msg.toLowerCase().includes("scan history") || msg.toLowerCase().includes("deactivate")) {
+      notify("warn", "Delete blocked", "Assets with scan history cannot be deleted. Please deactivate the asset instead.");
+      return;
+    }
+    notify("error", "Delete failed", msg);
   }
 }
 
@@ -945,13 +959,18 @@ function triggerSearchNow() {
   loadTable();
 }
 
+modifyStatus.addEventListener("change", () => {
+  if (modifyStatus.value === "inactive") {
+    modifyLocation.value = "4";
+  }
+});
+
 document.getElementById("addBtn").addEventListener("click", addAsset);
-document.getElementById("moveBtn").addEventListener("click", moveAsset);
+document.getElementById("loadModifyBtn").addEventListener("click", loadModifyAsset);
+document.getElementById("saveModifyBtn").addEventListener("click", saveModifyAsset);
 document.getElementById("deleteBtn").addEventListener("click", deleteAsset);
 
-document.getElementById("searchBtn").addEventListener("click", () => {
-  triggerSearchNow();
-});
+document.getElementById("searchBtn").addEventListener("click", triggerSearchNow);
 
 locationFilter.addEventListener("change", async () => {
   currentOffset = 0;
@@ -960,7 +979,6 @@ locationFilter.addEventListener("change", async () => {
 
 searchBox.addEventListener("input", () => {
   clearTimeout(searchTimer);
-
   searchTimer = setTimeout(async () => {
     currentOffset = 0;
     await loadTable();
@@ -986,13 +1004,9 @@ nextBtn.addEventListener("click", async () => {
   await loadTable();
 });
 
-segButtons.forEach(btn => {
-  btn.addEventListener("click", () => setMode(btn.dataset.mode));
-});
-
 (async function init() {
   try {
-    setMode("add");
+    resetModifyPanel();
     await loadItemsAndLocations();
     await loadTable();
     notify("success", "Ready", "Inventory management online.");
