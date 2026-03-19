@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -734,7 +733,7 @@ const CONTRACT = {
 /* ============================================================
    PAGE SETUP
 ============================================================ */
- const qs = new URLSearchParams(location.search);
+const qs = new URLSearchParams(location.search);
 const IPU_ID = Number(qs.get("ipu_id") || 1);
 const ipuName = qs.get("name") || "Dayton IPU";
 const ipuAddress = qs.get("address") || "324 Wilmington Ave., Dayton, OH 45420";
@@ -751,6 +750,7 @@ document.getElementById("signoutLoc").textContent = ipuName;
 
 const adminBtn = document.getElementById("adminBtn");
 adminBtn.href = `admin.html?ipu_id=${encodeURIComponent(IPU_ID)}&name=${encodeURIComponent(ipuName)}&address=${encodeURIComponent(ipuAddress)}`;
+
 /* ============================================================
    ELEMENTS
 ============================================================ */
@@ -1073,6 +1073,15 @@ function toastForResult(scan_type, asset, result){
     };
   }
 
+  if (result?.status === "inactive_asset") {
+    return {
+      state:"warn",
+      icon:"!",
+      meta:`Scan · ${actionLabel}`,
+      detail:`${asset} is inactive`
+    };
+  }
+
   if (result?.status === "already_on_hand") {
     return {
       state:"warn",
@@ -1158,7 +1167,10 @@ async function runScan(scan_type){
   const t = toastForResult(scan_type, asset, result);
   showToast(t);
 
-  if (result?.status === "success" || result?.status === "already_on_hand") {
+  if (
+    result?.status === "success" ||
+    result?.status === "already_on_hand"
+  ) {
     setLastScan({
       label: "Last scanned",
       item_name: result.item_name || (result?.notice === "already_on_hand" ? "Already on hand" : "Asset moved"),
@@ -1190,6 +1202,17 @@ async function runScan(scan_type){
         detail:String(err).slice(0, 180)
       });
     }
+  } else if (result?.status === "inactive_asset") {
+    logMovement({
+      ts: new Date().toISOString(),
+      time: nowTime(),
+      source: "scan",
+      action: scan_type,
+      item_name: result.item_name || "Inactive asset",
+      asset_number: asset,
+      ipu: `${ipuName} IPU`,
+      status: result.status
+    });
   } else {
     logMovement({
       ts: new Date().toISOString(),
@@ -1232,7 +1255,6 @@ async function doUndo(){
     return;
   }
 
-  // UNDO LAST SCAN
   if (lastAction.source === "scan") {
     showToast({ state:"pending", icon:"…", meta:"Undo", detail:lastAction.asset_number });
 
@@ -1286,7 +1308,6 @@ async function doUndo(){
     }
   }
 
-  // UNDO LAST MANUAL TAKE 1
   if (lastAction.source === "manual" && lastAction.action === "take_1") {
     const row = TRACKED_ITEMS.find(x => x.item === lastAction.item_name);
     if (!row) {

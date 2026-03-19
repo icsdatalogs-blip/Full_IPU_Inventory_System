@@ -657,7 +657,7 @@ td.qty.on.par-bad{
 }
 
 .modal-card.history-card{
-  width:min(1040px, 98vw);
+  width:min(1320px, 98vw);
 }
 
 .modal-head{
@@ -818,13 +818,17 @@ td.qty.on.par-bad{
 .history-table th:nth-child(2),
 .history-table td:nth-child(2){ width:130px; }
 .history-table th:nth-child(3),
-.history-table td:nth-child(3){ width:220px; }
+.history-table td:nth-child(3){ width:200px; }
 .history-table th:nth-child(4),
-.history-table td:nth-child(4){ width:120px; }
+.history-table td:nth-child(4){ width:150px; }
 .history-table th:nth-child(5),
-.history-table td:nth-child(5){ width:130px; }
+.history-table td:nth-child(5){ width:150px; }
 .history-table th:nth-child(6),
-.history-table td:nth-child(6){ width:100px; }
+.history-table td:nth-child(6){ width:120px; }
+.history-table th:nth-child(7),
+.history-table td:nth-child(7){ width:120px; }
+.history-table th:nth-child(8),
+.history-table td:nth-child(8){ width:100px; }
 
 .history-empty{
   padding: 14px;
@@ -1092,7 +1096,7 @@ td.qty.on.par-bad{
           <path d="M16.2 16.2 21 21"
                 stroke="rgba(15,23,42,.55)" stroke-width="1.8" stroke-linecap="round"/>
         </svg>
-        <input id="historySearchInput" class="ui-input" placeholder="Search asset number or asset id…" autocomplete="off" />
+        <input id="historySearchInput" class="ui-input" placeholder="Search asset, item, from, to, type, or status…" autocomplete="off" />
       </div>
       <button id="historySearchBtn" class="history-btn" type="button">Search</button>
       <button id="historyResetBtn" class="history-btn" type="button">Reset</button>
@@ -1105,10 +1109,11 @@ td.qty.on.par-bad{
             <th>Time</th>
             <th>Asset</th>
             <th>Item</th>
+            <th>From</th>
+            <th>To</th>
             <th>Type</th>
             <th>Status</th>
             <th>Role</th>
-            <th>Asset ID</th>
           </tr>
         </thead>
         <tbody id="historyRows"></tbody>
@@ -1236,9 +1241,15 @@ function formatDateTime(value){
 function statusClass(v){
   const s = String(v || "").toLowerCase();
   if (["success", "ok"].includes(s)) return "ok";
-  if (["already_on_hand", "warning", "warn"].includes(s)) return "warn";
+  if (["already_on_hand", "warning", "warn", "inactive_asset"].includes(s)) return "warn";
   if (["unknown_asset", "error", "failed", "bad"].includes(s)) return "bad";
   return "";
+}
+
+function getLocationLabel(row, side){
+  const rel = side === "from" ? row.from_location : row.to_location;
+  const id = side === "from" ? row.from_location_id : row.to_location_id;
+  return rel?.name || (id ? `Location ${id}` : "—");
 }
 
 let TRACKED_ITEMS = [];
@@ -1580,6 +1591,21 @@ async function runScan(scan_type){
 
     await loadItems();
 
+  } else if (result?.status === "inactive_asset") {
+
+    notify({
+      type: "warn",
+      title: "Inactive asset",
+      message: `${asset} is inactive. Reactivate it in Inventory Management.`
+    });
+
+    pushScanQueue({
+      status: "warn",
+      asset_number: asset,
+      item_name: result.item_name || "",
+      note: "Inactive asset · Reactivate in Inventory Management"
+    });
+
   } else if (result?.status === "unknown_asset") {
 
     notify({ type: "error", title: "Unknown asset", message: asset });
@@ -1690,21 +1716,23 @@ function renderHistoryRows(rows){
   rows.forEach(row => {
     const time = row.created_at ? formatDateTime(row.created_at) : "";
     const assetNumber = row.assets?.asset_number ?? "—";
-    const itemName = row.assets?.items?.name ?? "—";
+    const itemName = row.assets?.items?.name ?? row.items?.name ?? "—";
     const typeVal = row.scan_type || "";
     const statusVal = row.result || "";
     const roleVal = row.scanner_role || "—";
-    const assetIdVal = row.asset_id ?? "—";
+    const fromVal = getLocationLabel(row, "from");
+    const toVal = getLocationLabel(row, "to");
 
     const tr = document.createElement("tr");
     tr.innerHTML = `
       <td>${escapeHtml(time)}</td>
       <td>${escapeHtml(String(assetNumber))}</td>
       <td>${escapeHtml(itemName)}</td>
+      <td>${escapeHtml(fromVal)}</td>
+      <td>${escapeHtml(toVal)}</td>
       <td>${escapeHtml(typeVal)}</td>
       <td><span class="status-chip ${statusClass(statusVal)}">${escapeHtml(statusVal || "—")}</span></td>
       <td>${escapeHtml(roleVal)}</td>
-      <td>${escapeHtml(String(assetIdVal))}</td>
     `;
     historyRows.appendChild(tr);
   });
@@ -1717,8 +1745,22 @@ function refineHistoryFromCache(searchTerm = ""){
     const q = searchTerm.trim().toLowerCase();
     rows = HISTORY_CACHE.filter(r => {
       const assetNumber = String(r.assets?.asset_number ?? "").toLowerCase();
-      const assetId = String(r.asset_id ?? "").toLowerCase();
-      return assetNumber.includes(q) || assetId.includes(q);
+      const itemName = String(r.assets?.items?.name ?? r.items?.name ?? "").toLowerCase();
+      const fromName = String(getLocationLabel(r, "from")).toLowerCase();
+      const toName = String(getLocationLabel(r, "to")).toLowerCase();
+      const scanType = String(r.scan_type ?? "").toLowerCase();
+      const result = String(r.result ?? "").toLowerCase();
+      const role = String(r.scanner_role ?? "").toLowerCase();
+
+      return (
+        assetNumber.includes(q) ||
+        itemName.includes(q) ||
+        fromName.includes(q) ||
+        toName.includes(q) ||
+        scanType.includes(q) ||
+        result.includes(q) ||
+        role.includes(q)
+      );
     });
   }
 
@@ -1740,11 +1782,12 @@ async function loadHistory(){
     historyEmpty.style.display = "block";
     historyEmpty.textContent = "Loading history…";
 
-    notify({ type:"pending", title:"Loading", message:"Fetching history…" });
-
     const url =
       `${REST_BASE}/rest/v1/${HISTORY_TABLE}` +
-      `?select=id,created_at,ipu_id,asset_id,item_id,scanner_role,scan_type,result,assets(asset_number,item_id,items(name)),items(name)` +
+      `?select=id,created_at,ipu_id,asset_id,item_id,scanner_role,scan_type,result,from_location_id,to_location_id,` +
+      `from_location:locations!scan_history_from_location_id_fkey(name),` +
+      `to_location:locations!scan_history_to_location_id_fkey(name),` +
+      `assets(asset_number,item_id,items(name)),items(name)` +
       `&ipu_id=eq.${IPU_ID}` +
       `&order=created_at.desc` +
       `&limit=250`;
@@ -1760,13 +1803,6 @@ async function loadHistory(){
     HISTORY_CACHE = Array.isArray(data) ? data : [];
 
     renderHistoryRows(HISTORY_CACHE);
-
-    notify({
-      type:"success",
-      title:"History loaded",
-      message:`Showing recent IPU ${IPU_ID} history`,
-      ms: 1600
-    });
   } catch (err){
     console.error(err);
     HISTORY_CACHE = [];
